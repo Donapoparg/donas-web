@@ -3,17 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dona Pop Mayorista - Sistematiza la venta de impulso con nuestros productos de alta rotación. Logística eficiente, rentabilidad asegurada y garantía de frescura.">
     <title>Dona Pop - Mayorista</title>
     
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Scripts con defer para no bloquear el renderizado -->
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js" defer></script>
 
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Poppins', 'sans-serif'],
+        // Configuración previa de Tailwind (se ejecutará cuando cargue el script)
+        window.tailwind = {
+            config: {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            sans: ['Poppins', 'sans-serif'],
+                        }
                     }
                 }
             }
@@ -23,15 +28,17 @@
 <body class="bg-slate-900">
     <div id="root"></div>
 
+    <!-- type="text/babel" para que Babel lo procese -->
     <script type="text/babel" data-type="module">
-        import React, { useState, useEffect, useRef, memo } from 'https://esm.sh/react@18.2.0?dev';
-        import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client?dev';
+        // USAMOS VERSIONES DE PRODUCCIÓN (sin ?dev) PARA MEJORAR EL RENDIMIENTO
+        import React, { useState, useEffect, useRef, memo } from 'https://esm.sh/react@18.2.0';
+        import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client';
         import { 
             Send, Store, Phone, MapPin, Clock, ShoppingBag, ArrowLeft, 
             Menu, X, ArrowRight, RefreshCw, Package, ShieldCheck, 
             Eye, Calculator, Tags, TrendingUp, BarChart3, Lock, Coins, CheckCircle2, Flame, Utensils, 
             Layers, Maximize, FileText, Shield, HelpCircle, ChevronDown, ChevronUp
-        } from 'https://esm.sh/lucide-react@0.292.0?dev';
+        } from 'https://esm.sh/lucide-react@0.292.0';
 
         // ==========================================
         // UTILS
@@ -147,7 +154,11 @@
                 <div className="flex items-center gap-2 text-pink-600 font-extrabold text-lg cursor-pointer" onClick={onBack}>
                 <DonutIcon className="w-6 h-6" /> Dona Pop
                 </div>
-                <button onClick={onBack} className="flex items-center gap-2 text-xs font-semibold text-gray-500 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-full transition-colors">
+                <button 
+                    onClick={onBack} 
+                    aria-label="Volver atrás"
+                    className="flex items-center gap-2 text-xs font-semibold text-gray-600 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500"
+                >
                 <ArrowLeft className="w-4 h-4" /> Volver
                 </button>
             </div>
@@ -164,7 +175,7 @@
                     <div className="text-center mb-10">
                     <div className="inline-flex p-3 bg-pink-50 text-pink-600 rounded-xl mb-4"><FileText className="w-8 h-8" /></div>
                     <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Términos y Condiciones</h1>
-                    <p className="text-gray-500 text-sm font-medium tracking-wide uppercase">Suministro Mayorista</p>
+                    <p className="text-gray-600 text-sm font-medium tracking-wide uppercase">Suministro Mayorista</p>
                     </div>
                     <div className="space-y-8 text-gray-600 leading-relaxed text-sm md:text-base">
                         <div className="bg-gray-50 p-5 rounded-xl border-l-4 border-pink-500">
@@ -210,7 +221,7 @@
                                 <Lock className="w-5 h-5 text-yellow-600" />
                                 <p className="text-sm text-yellow-800 font-bold">No se venderá el producto a comercios del mismo rubro en un radio de 100 metros.</p>
                             </div>
-                            <p className="text-xs text-gray-500 italic"><strong>Pérdida de Exclusividad:</strong> Si el COMERCIO suspende o rechaza un pedido programado sin aviso previo de 24hs.</p>
+                            <p className="text-xs text-gray-600 italic"><strong>Pérdida de Exclusividad:</strong> Si el COMERCIO suspende o rechaza un pedido programado sin aviso previo de 24hs.</p>
                             </div>
                         </section>
                         <section>
@@ -238,7 +249,7 @@
                         </section>
                     </div>
                     <div className="mt-12 pt-8 border-t border-gray-100 text-center">
-                    <button onClick={onBack} className="inline-flex items-center gap-2 bg-gray-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-gray-800 transition-all transform hover:-translate-y-1 text-sm">
+                    <button onClick={onBack} className="inline-flex items-center gap-2 bg-gray-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-gray-800 transition-all transform hover:-translate-y-1 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900">
                         Entendido, Volver al Sitio
                     </button>
                     </div>
@@ -258,7 +269,7 @@
                     <div className="text-center mb-10">
                     <div className="inline-flex p-3 bg-emerald-50 text-emerald-600 rounded-xl mb-4"><Shield className="w-8 h-8" /></div>
                     <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Política de Privacidad</h1>
-                    <p className="text-gray-500 text-sm font-medium tracking-wide uppercase">Compromiso de Confidencialidad</p>
+                    <p className="text-gray-600 text-sm font-medium tracking-wide uppercase">Compromiso de Confidencialidad</p>
                     </div>
                     <div className="space-y-8 text-gray-600 leading-relaxed text-sm md:text-base">
                         <div className="bg-gray-50 p-5 rounded-xl border-l-4 border-emerald-500">
@@ -293,7 +304,7 @@
                         </section>
                     </div>
                     <div className="mt-12 pt-8 border-t border-gray-100 text-center">
-                    <button onClick={onBack} className="inline-flex items-center gap-2 bg-gray-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-gray-800 transition-all transform hover:-translate-y-1 text-sm">
+                    <button onClick={onBack} className="inline-flex items-center gap-2 bg-gray-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-gray-800 transition-all transform hover:-translate-y-1 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900">
                         Entendido, Volver al Sitio
                     </button>
                     </div>
@@ -317,7 +328,13 @@
             <div className="min-h-screen bg-pink-50/50 font-sans text-gray-800 p-4 flex items-center justify-center animate-in fade-in slide-in-from-right duration-300 pattern-dots pt-24 md:pt-10">
                 <main className="w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden border border-white ring-1 ring-black/5 relative">
                 <div className="bg-gradient-to-br from-pink-600 to-purple-700 p-8 text-white text-center relative">
-                    <button onClick={onBack} className="absolute left-6 top-6 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"><ArrowLeft className="w-5 h-5" /></button>
+                    <button 
+                        onClick={onBack} 
+                        aria-label="Volver atrás"
+                        className="absolute left-6 top-6 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white"
+                    >
+                        <ArrowLeft className="w-5 h-5" />
+                    </button>
                     <div className="flex justify-center mb-4"><div className="p-3 bg-white/10 rounded-2xl backdrop-blur-sm animate-float"><Store className="w-8 h-8 text-white" /></div></div>
                     <h1 className="text-2xl font-bold tracking-tight mb-2">Alta de Comercio</h1>
                     <p className="text-pink-100 text-sm opacity-90">Completa tus datos para comenzar.</p>
@@ -325,14 +342,23 @@
                 <form onSubmit={handleSubmit} className="p-8 space-y-5">
                     {[ { label: "Nombre Comercio", name: "nombreComercio", icon: ShoppingBag, ph: "Ej. Kiosco El Paso", type: "text" }, { label: "WhatsApp", name: "whatsapp", icon: Phone, ph: "Ej. 11 1234 5678", type: "tel" }, { label: "Dirección", name: "direccion", icon: MapPin, ph: "Calle, Número, Localidad", type: "text" }, { label: "Horario", name: "horario", icon: Clock, ph: "Ej. Lun a Vie 9-18hs", type: "text" } ].map((field, idx) => (
                         <div key={idx}>
-                        <label className="block text-sm font-bold text-gray-700 mb-1.5 ml-1">{field.label}</label>
+                        <label htmlFor={field.name} className="block text-sm font-bold text-gray-700 mb-1.5 ml-1">{field.label}</label>
                         <div className="relative group">
                             <field.icon className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 group-focus-within:text-pink-500 transition-colors" />
-                            <input required type={field.type} name={field.name} value={formData[field.name]} onChange={handleChange} className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-pink-100 focus:border-pink-500 outline-none transition-all font-medium text-gray-900 placeholder-gray-400" placeholder={field.ph} />
+                            <input 
+                                required 
+                                id={field.name}
+                                type={field.type} 
+                                name={field.name} 
+                                value={formData[field.name]} 
+                                onChange={handleChange} 
+                                className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-pink-100 focus:border-pink-500 outline-none transition-all font-medium text-gray-900 placeholder-gray-400" 
+                                placeholder={field.ph} 
+                            />
                         </div>
                         </div>
                     ))}
-                    <button type="submit" className="w-full mt-4 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-pink-500/30 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 active:scale-[0.98]"><Send className="w-5 h-5" /> Enviar Solicitud de Alta</button>
+                    <button type="submit" className="w-full mt-4 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-pink-500/30 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"><Send className="w-5 h-5" /> Enviar Solicitud de Alta</button>
                     <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100"><CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" /><p className="text-xs text-gray-500 leading-relaxed">Al enviar este formulario aceptas ser contactado por nuestro equipo comercial.</p></div>
                 </form>
                 </main>
@@ -356,34 +382,79 @@
             }, []);
 
             const toggleFaq = (index) => setOpenFaq(openFaq === index ? null : index);
-            const scrollToSection = (id) => {
-            const element = document.getElementById(id);
-            if (element) {
-                const headerOffset = 80;
-                const elementPosition = element.getBoundingClientRect().top;
-                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-                window.scrollTo({ top: offsetPosition, behavior: "smooth" });
-            }
-            setIsMobileMenuOpen(false);
+            
+            const scrollToSection = (e, id) => {
+                e.preventDefault();
+                const element = document.getElementById(id);
+                if (element) {
+                    const headerOffset = 80;
+                    const elementPosition = element.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                    window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+                }
+                setIsMobileMenuOpen(false);
             };
 
             return (
             <div className="font-sans text-gray-800 bg-white relative selection:bg-pink-100 selection:text-pink-900 overflow-x-hidden scroll-smooth">
                 <GlobalStyles />
-                <a href={DATA.whatsappLink} target="_blank" rel="noreferrer" className="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white p-3 md:p-4 rounded-full shadow-2xl hover:bg-[#20bd5a] transition-all transform hover:scale-110 active:scale-95 flex items-center justify-center gap-2 group border-4 border-white ring-2 ring-black/5"><WhatsAppIcon className="w-6 h-6 md:w-7 md:h-7" /><span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 ease-in-out whitespace-nowrap font-bold text-sm hidden md:inline-block">Más Info</span></a>
+                <a 
+                    href={DATA.whatsappLink} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    aria-label="Contactar por WhatsApp"
+                    className="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white p-3 md:p-4 rounded-full shadow-2xl hover:bg-[#20bd5a] transition-all transform hover:scale-110 active:scale-95 flex items-center justify-center gap-2 group border-4 border-white ring-2 ring-black/5 focus:outline-none focus:ring-4 focus:ring-green-400"
+                >
+                    <WhatsAppIcon className="w-6 h-6 md:w-7 md:h-7" />
+                    <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 ease-in-out whitespace-nowrap font-bold text-sm hidden md:inline-block">Más Info</span>
+                </a>
 
                 <nav className={`fixed w-full z-40 font-poppins transition-all duration-300 ${scrolled || isMobileMenuOpen ? 'bg-gray-900/95 backdrop-blur-md shadow-lg py-3' : 'bg-transparent py-4'}`}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-12">
                     <div className="flex items-center cursor-pointer z-50" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}><span className="text-2xl font-extrabold flex items-center gap-2 tracking-tight text-white hover:scale-105 transition-transform"><DonutIcon className="w-8 h-8 text-pink-500" /> Dona Pop</span></div>
                     <div className="hidden md:flex items-center space-x-6">
-                        {['Beneficios', 'Productos', 'Rentabilidad', 'FAQ'].map((item) => (<button key={item} onClick={() => scrollToSection(item.toLowerCase())} className="text-sm font-semibold text-gray-200 hover:text-white transition-colors uppercase tracking-wide hover:scale-105">{item}</button>))}
-                        <button onClick={onNavigateToRegister} className="bg-white text-pink-600 hover:bg-gray-100 px-6 py-2 rounded-full font-bold text-sm transition-all shadow-lg transform hover:-translate-y-0.5 hover:shadow-xl active:scale-95">Alta Cliente</button>
+                        {['Beneficios', 'Productos', 'Rentabilidad', 'FAQ'].map((item) => (
+                            <a 
+                                key={item} 
+                                href={`#${item.toLowerCase()}`}
+                                onClick={(e) => scrollToSection(e, item.toLowerCase())} 
+                                className="text-sm font-semibold text-gray-200 hover:text-white transition-colors uppercase tracking-wide hover:scale-105 focus:outline-none focus:text-pink-400"
+                            >
+                                {item}
+                            </a>
+                        ))}
+                        <button onClick={onNavigateToRegister} className="bg-white text-pink-600 hover:bg-gray-100 px-6 py-2 rounded-full font-bold text-sm transition-all shadow-lg transform hover:-translate-y-0.5 hover:shadow-xl active:scale-95 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 focus:ring-offset-gray-900">Alta Cliente</button>
                     </div>
-                    <div className="md:hidden flex items-center z-50"><button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="focus:outline-none text-white p-2 active:scale-90 transition-transform">{isMobileMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}</button></div>
+                    <div className="md:hidden flex items-center z-50">
+                        <button 
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
+                            aria-label={isMobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
+                            aria-expanded={isMobileMenuOpen}
+                            className="focus:outline-none text-white p-2 active:scale-90 transition-transform focus:ring-2 focus:ring-pink-500 rounded-lg"
+                        >
+                            {isMobileMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
+                        </button>
+                    </div>
                     </div>
                 </div>
-                {isMobileMenuOpen && (<div className="md:hidden absolute top-full left-0 w-full bg-gray-900 border-t border-gray-800 shadow-xl animate-in slide-in-from-top-5"><div className="flex flex-col py-4 px-4 space-y-2">{['Beneficios', 'Productos', 'Rentabilidad', 'FAQ'].map((item) => (<button key={item} onClick={() => scrollToSection(item.toLowerCase())} className="text-left px-4 py-3 text-gray-100 font-medium hover:bg-gray-800 rounded-xl transition-colors text-base">{item}</button>))} <button onClick={onNavigateToRegister} className="text-center px-4 py-3 text-white font-bold bg-pink-600 hover:bg-pink-700 rounded-xl transition-colors text-base mt-2 shadow-lg">Solicitar Alta de Cliente</button></div></div>)}
+                {isMobileMenuOpen && (
+                    <div className="md:hidden absolute top-full left-0 w-full bg-gray-900 border-t border-gray-800 shadow-xl animate-in slide-in-from-top-5">
+                        <div className="flex flex-col py-4 px-4 space-y-2">
+                            {['Beneficios', 'Productos', 'Rentabilidad', 'FAQ'].map((item) => (
+                                <a 
+                                    key={item} 
+                                    href={`#${item.toLowerCase()}`}
+                                    onClick={(e) => scrollToSection(e, item.toLowerCase())} 
+                                    className="text-left px-4 py-3 text-gray-100 font-medium hover:bg-gray-800 rounded-xl transition-colors text-base"
+                                >
+                                    {item}
+                                </a>
+                            ))} 
+                            <button onClick={onNavigateToRegister} className="text-center px-4 py-3 text-white font-bold bg-pink-600 hover:bg-pink-700 rounded-xl transition-colors text-base mt-2 shadow-lg">Solicitar Alta de Cliente</button>
+                        </div>
+                    </div>
+                )}
                 </nav>
 
                 {/* HERO - Compactado pero Impactante */}
@@ -392,33 +463,33 @@
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 backdrop-blur-md border border-white/10 mb-6 animate-pulse shadow-lg ring-1 ring-white/10"><span className="flex h-2 w-2 relative"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-pink-500"></span></span><span className="text-pink-100 font-bold text-xs tracking-widest uppercase">Líderes en venta impulsiva</span></div>
                     <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight font-poppins tracking-tight drop-shadow-xl">Sistematiza la <br className="md:hidden" /><span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400">Venta de Impulso</span></h1>
                     <p className="text-base sm:text-lg md:text-2xl text-gray-300 font-light mb-10 max-w-2xl mx-auto leading-relaxed px-2 drop-shadow-md">Transforma tu punto de venta en una máquina de rentabilidad automática. Logística inteligente, riesgo controlado y ganancias aseguradas.</p>
-                    <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-6 sm:px-0"><button onClick={onNavigateToRegister} className="w-full sm:w-auto bg-gradient-to-r from-pink-600 to-pink-500 text-white px-8 py-3.5 rounded-full text-lg font-bold hover:shadow-pink-500/30 hover:shadow-2xl transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2 active:scale-95">Solicitar Alta <ArrowRight className="w-5 h-5" /></button><button onClick={() => scrollToSection('rentabilidad')} className="w-full sm:w-auto bg-white/5 backdrop-blur-sm text-white border border-white/20 px-8 py-3.5 rounded-full text-lg font-bold hover:bg-white/10 transition-all flex items-center justify-center gap-2 active:scale-95"><BarChart3 className="w-5 h-5" /> Ver Rentabilidad</button></div>
+                    <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-6 sm:px-0"><button onClick={onNavigateToRegister} className="w-full sm:w-auto bg-gradient-to-r from-pink-600 to-pink-500 text-white px-8 py-3.5 rounded-full text-lg font-bold hover:shadow-pink-500/30 hover:shadow-2xl transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2 active:scale-95 focus:outline-none focus:ring-4 focus:ring-pink-500/50">Solicitar Alta <ArrowRight className="w-5 h-5" /></button><button onClick={(e) => scrollToSection(e, 'rentabilidad')} className="w-full sm:w-auto bg-white/5 backdrop-blur-sm text-white border border-white/20 px-8 py-3.5 rounded-full text-lg font-bold hover:bg-white/10 transition-all flex items-center justify-center gap-2 active:scale-95 focus:outline-none focus:ring-4 focus:ring-white/50"><BarChart3 className="w-5 h-5" /> Ver Rentabilidad</button></div>
                 </div>
                 
                 {/* Scroll Indicator - CORREGIDO PARA MÓVIL */}
                 {/* Se usó 'inset-x-0' y 'justify-center' en lugar de translate para evitar conflicto con la animación */}
-                <div className="absolute bottom-6 inset-x-0 mx-auto flex flex-col items-center justify-center animate-bounce text-white/50 cursor-pointer z-20" onClick={() => scrollToSection('rentabilidad')}>
+                <div className="absolute bottom-6 inset-x-0 mx-auto flex flex-col items-center justify-center animate-bounce text-white/50 cursor-pointer z-20" onClick={(e) => scrollToSection(e, 'rentabilidad')}>
                     <span className="text-[10px] font-bold tracking-widest uppercase mb-1">Desliza</span>
                     <ChevronDown className="w-5 h-5" />
                 </div>
                 </header>
 
-                {/* PSICOLOGIA - Layout limpio */}
+                {/* PSICOLOGIA - Layout limpio - CORREGIDO: UL inválido cambiado a DIV */}
                 <section className="py-16 md:py-24 bg-gray-900 text-white font-poppins relative">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
                     <div className="space-y-8">
                         <Reveal>
                         <h2 className="text-3xl md:text-4xl font-bold mb-4 tracking-tight">La Psicología del Impulso</h2>
-                        <p className="text-gray-400 text-base leading-relaxed border-l-4 border-pink-500 pl-5">Dona Pop no es solo un producto delicioso; es una estrategia comercial diseñada milimétricamente. Cada detalle visual está pensado para activar el gatillo de compra inmediata.</p>
+                        <p className="text-gray-300 text-base leading-relaxed border-l-4 border-pink-500 pl-5">Dona Pop no es solo un producto delicioso; es una estrategia comercial diseñada milimétricamente. Cada detalle visual está pensado para activar el gatillo de compra inmediata.</p>
                         </Reveal>
-                        <ul className="space-y-6 mt-6">
+                        <div className="space-y-6 mt-6">
                         {DATA.psychologyItems.map((item, index) => (
                             <Reveal key={index} delay={index * 150}>
-                            <li className="flex items-start group"><div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center mt-1 transition-transform group-hover:scale-110 ${item.bg}`}><item.icon className={`w-6 h-6 ${item.color}`} /></div><div className="ml-5"><h4 className={`text-lg font-bold mb-1 ${item.color}`}>{item.title}</h4><p className="text-gray-400 leading-relaxed text-sm">{item.desc}</p></div></li>
+                            <div className="flex items-start group"><div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center mt-1 transition-transform group-hover:scale-110 ${item.bg}`}><item.icon className={`w-6 h-6 ${item.color}`} /></div><div className="ml-5"><h4 className={`text-lg font-bold mb-1 ${item.color}`}>{item.title}</h4><p className="text-gray-400 leading-relaxed text-sm">{item.desc}</p></div></div>
                             </Reveal>
                         ))}
-                        </ul>
+                        </div>
                     </div>
                     <Reveal delay={300} className="relative mt-8 lg:mt-0">
                         <div className="relative bg-gray-800/50 border border-white/10 p-8 md:p-10 rounded-2xl backdrop-blur-xl shadow-2xl">
@@ -496,14 +567,20 @@
                     </div>
                 </section>
 
-                {/* EMPAQUE - Visual - CARD REEMPLAZO IMAGEN */}
+                {/* EMPAQUE - Visual - CARD REEMPLAZO IMAGEN - OPTIMIZADO */}
                 <section className="w-full flex flex-col lg:flex-row-reverse bg-gray-900 text-white overflow-hidden font-poppins">
                 <div className="lg:w-1/2 p-8 md:p-16 flex flex-col justify-center bg-gray-900"><Reveal><div className="max-w-lg mx-auto lg:mx-0 lg:ml-auto"><div className="inline-flex items-center gap-2 bg-pink-500/20 border border-pink-500/30 px-3 py-1 rounded-full mb-6 text-[10px] font-bold tracking-widest uppercase text-pink-300"><Layers className="w-3 h-3" /> Optimización</div><h2 className="text-3xl md:text-4xl font-extrabold mb-4 leading-tight">Empaque Inteligente y Apilable</h2><p className="text-gray-400 text-base mb-8 leading-relaxed">El diseño de nuestras cajas master no solo protege el producto, sino que también optimiza cada centímetro de tu espacio de venta y almacenamiento.</p><div className="grid grid-cols-1 sm:grid-cols-2 gap-4"><div className="bg-gray-800/50 p-5 rounded-2xl border border-gray-700"><Maximize className="w-6 h-6 text-pink-500 mb-3" /><h4 className="font-bold text-white text-base mb-1">Orden Total</h4><p className="text-xs text-gray-400">Reducción del desorden visual en depósito.</p></div><div className="bg-gray-800/50 p-5 rounded-2xl border border-gray-700"><Package className="w-6 h-6 text-purple-500 mb-3" /><h4 className="font-bold text-white text-base mb-1">100% Estibables</h4><p className="text-xs text-gray-400">Facilita el manejo y la organización.</p></div></div></div></Reveal></div>
                 <div className="lg:w-1/2 p-8 lg:p-16 flex items-center justify-center bg-gray-800/50">
                     <Reveal className="w-full max-w-lg">
                         <div className="bg-gray-800 border border-gray-700 rounded-3xl p-3 shadow-2xl hover:scale-[1.02] transition-transform duration-500">
                             <div className="bg-gray-900 rounded-2xl overflow-hidden relative">
-                                <img src="img/cajas.jpg" alt="Cajas Master Apiladas" className="w-full h-auto object-contain block transform hover:scale-105 transition-transform duration-700" />
+                                <img 
+                                    src="img/cajas.jpg" 
+                                    alt="Cajas Master Apiladas" 
+                                    width="564" height="426" 
+                                    loading="lazy"
+                                    className="w-full h-auto object-contain block transform hover:scale-105 transition-transform duration-700" 
+                                />
                             </div>
                             <div className="pt-3 px-2 flex justify-between items-center">
                                 <span className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Presentación Oficial</span>
@@ -514,20 +591,40 @@
                 </div>
                 </section>
 
-                {/* PRODUCTOS */}
+                {/* PRODUCTOS - OPTIMIZADO */}
                 <section id="productos" className="py-16 md:py-24 bg-white font-poppins">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <Reveal><div className="text-center mb-12"><h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Líneas de Producto</h2><p className="text-lg text-gray-500">Diseñados visualmente para activar el gatillo de compra por impulso.</p></div></Reveal>
                     <div className="mb-16"><Reveal><div className="flex items-center gap-3 mb-8 pl-4 border-l-8 border-pink-500"><h3 className="text-2xl font-bold text-gray-900">Línea Dulce</h3><span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-xs font-bold uppercase tracking-wider">Clásico</span></div></Reveal>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {[{ name: "Chocolate con Oreo", desc: "¡Fusión perfecta de chocolate y crujientes trozos de galleta Oreo! Una tentación irresistible.", tag: "Top Seller", color: "pink", icon: TrendingUp, image: "img/oreo.jpg" }, { name: "Vainilla con Chips", desc: "Vainilla con corazón de chips, baño rosa sabor frutilla y grageas. ¡Un placer visual!", tag: "Visual Impact", color: "purple", icon: Eye, image: "img/chips.jpg" }].map((prod, i) => (
-                            <Reveal key={i} delay={(i + 1) * 150} className="group cursor-default hover:translate-y-[-5px] transition-transform duration-300"><div className="bg-gray-100 rounded-[2rem] overflow-hidden aspect-[16/9] relative mb-4 shadow-sm group-hover:shadow-lg transition-shadow"><img src={prod.image} alt={prod.name} className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" /></div><h4 className={`text-xl font-bold text-gray-900 mb-1`}>{prod.name}</h4><p className="text-gray-500 leading-relaxed text-sm mb-3">{prod.desc}</p><span className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase text-${prod.color}-600 bg-${prod.color}-50 px-2 py-1 rounded-md`}><prod.icon className="w-3 h-3"/> {prod.tag}</span></Reveal>
+                            <Reveal key={i} delay={(i + 1) * 150} className="group cursor-default hover:translate-y-[-5px] transition-transform duration-300">
+                                <div className="bg-gray-100 rounded-[2rem] overflow-hidden aspect-[16/9] relative mb-4 shadow-sm group-hover:shadow-lg transition-shadow">
+                                    <img 
+                                        src={prod.image} 
+                                        alt={prod.name} 
+                                        width="600" height="337" 
+                                        loading="lazy"
+                                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" 
+                                    />
+                                </div>
+                                <h4 className={`text-xl font-bold text-gray-900 mb-1`}>{prod.name}</h4><p className="text-gray-500 leading-relaxed text-sm mb-3">{prod.desc}</p><span className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase text-${prod.color}-600 bg-${prod.color}-50 px-2 py-1 rounded-md`}><prod.icon className="w-3 h-3"/> {prod.tag}</span>
+                            </Reveal>
                         ))}
                     </div>
                     </div>
                     <Reveal>
                     <div className="bg-gray-900 rounded-[2.5rem] overflow-hidden shadow-xl flex flex-col md:flex-row min-h-[400px] group">
-                        <div className="md:w-1/2 relative bg-gray-800 min-h-[250px] overflow-hidden"><img src="img/saladas.jpg" alt="Línea Salada" className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-700 transform group-hover:scale-105" /><div className="absolute top-6 left-6 z-20"><span className="bg-orange-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-widest inline-flex items-center gap-2 shadow-lg"><Flame className="w-3 h-3" /> Innovación</span></div></div>
+                        <div className="md:w-1/2 relative bg-gray-800 min-h-[250px] overflow-hidden">
+                            <img 
+                                src="img/saladas.jpg" 
+                                alt="Línea Salada" 
+                                width="600" height="400" 
+                                loading="lazy"
+                                className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-700 transform group-hover:scale-105" 
+                            />
+                            <div className="absolute top-6 left-6 z-20"><span className="bg-orange-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-widest inline-flex items-center gap-2 shadow-lg"><Flame className="w-3 h-3" /> Innovación</span></div>
+                        </div>
                         <div className="md:w-1/2 p-8 md:p-12 flex flex-col justify-center text-white relative"><div className="relative z-10"><h3 className="text-2xl md:text-3xl font-bold mb-4">El Snacking Salado</h3><p className="text-gray-400 text-base mb-8 leading-relaxed">Rompemos el molde tradicional ofreciendo una alternativa salada de alta calidad para el antojo de mediodía.</p><div className="space-y-4">{[{ title: "Paleta y Queso Gratinado", sub: "El sabor familiar con un toque de pimienta.", icon: Utensils, color: "orange" }, { title: "Salame con Toque Picante", sub: "Intensidad premium con ají molido.", icon: Flame, color: "red" }].map((item, i) => (<div key={i} className="flex items-start gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors border border-transparent hover:border-white/10"><div className={`p-2 bg-${item.color}-500/20 text-${item.color}-400 rounded-lg`}><item.icon className="w-5 h-5" /></div><div><h5 className="font-bold text-base mb-0.5">{item.title}</h5><p className="text-gray-400 text-xs">{item.sub}</p></div></div>))}</div></div></div>
                     </div>
                     </Reveal>
@@ -541,9 +638,22 @@
                     <div className="space-y-3">
                     {DATA.faqItems.map((item, i) => (
                         <Reveal key={i} delay={i * 50}>
-                        <div className={`bg-white rounded-xl border transition-all duration-300 cursor-pointer ${openFaq === i ? 'border-pink-500 ring-1 ring-pink-500 shadow-md' : 'border-gray-200 hover:border-pink-300'}`} onClick={() => toggleFaq(i)}>
+                        <div 
+                            className={`bg-white rounded-xl border transition-all duration-300 cursor-pointer ${openFaq === i ? 'border-pink-500 ring-1 ring-pink-500 shadow-md' : 'border-gray-200 hover:border-pink-300'}`} 
+                            onClick={() => toggleFaq(i)}
+                            aria-expanded={openFaq === i}
+                            aria-controls={`faq-answer-${i}`}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleFaq(i); } }}
+                        >
                             <div className="flex justify-between items-center p-5"><h3 className={`text-base font-bold transition-colors ${openFaq === i ? 'text-pink-600' : 'text-gray-900'}`}>{item.question}</h3><div className={`p-1 rounded-full ${openFaq === i ? 'text-pink-600' : 'text-gray-400'}`}>{openFaq === i ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}</div></div>
-                            <div className={`overflow-hidden transition-all duration-300 ${openFaq === i ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}><p className="px-5 pb-5 text-gray-500 text-sm leading-relaxed border-t border-gray-50 pt-3">{item.answer}</p></div>
+                            <div 
+                                id={`faq-answer-${i}`}
+                                className={`overflow-hidden transition-all duration-300 ${openFaq === i ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}
+                            >
+                                <p className="px-5 pb-5 text-gray-500 text-sm leading-relaxed border-t border-gray-50 pt-3">{item.answer}</p>
+                            </div>
                         </div>
                         </Reveal>
                     ))}
@@ -556,9 +666,9 @@
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-6">
                     <div className="text-center md:text-left"><span className="text-2xl font-extrabold text-white flex items-center justify-center md:justify-start gap-2 hover:text-pink-500 transition-colors cursor-pointer"><DonutIcon className="text-pink-500 w-6 h-6" /> Dona Pop</span><p className="text-gray-400 mt-2">Sistematizando la venta por impulso en Argentina. <br/> Logística eficiente, rentabilidad asegurada.</p></div>
-                    <div className="flex flex-col items-center md:items-end gap-3"><p className="text-gray-400">¿Dudas? Escríbenos directamente</p><a href={DATA.whatsappLink} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-white bg-green-600 hover:bg-green-700 px-5 py-2.5 rounded-full font-bold transition-colors hover:shadow-lg hover:shadow-green-500/20"><WhatsAppIcon className="w-4 h-4" /> Iniciar Chat WhatsApp</a></div>
+                    <div className="flex flex-col items-center md:items-end gap-3"><p className="text-gray-400">¿Dudas? Escríbenos directamente</p><a href={DATA.whatsappLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white bg-green-600 hover:bg-green-700 px-5 py-2.5 rounded-full font-bold transition-colors hover:shadow-lg hover:shadow-green-500/20 focus:outline-none focus:ring-2 focus:ring-green-400"><WhatsAppIcon className="w-4 h-4" /> Iniciar Chat WhatsApp</a></div>
                     </div>
-                    <div className="mt-8 border-t border-gray-800 pt-6 flex flex-col md:flex-row justify-between items-center text-gray-500"><p>&copy; 2024 Dona Pop. Todos los derechos reservados.</p><div className="flex gap-6 mt-4 md:mt-0"><span onClick={onNavigateToTerms} className="hover:text-white cursor-pointer transition">Términos y Condiciones</span><span onClick={onNavigateToPrivacy} className="hover:text-white cursor-pointer transition">Política de Privacidad</span></div></div>
+                    <div className="mt-8 border-t border-gray-800 pt-6 flex flex-col md:flex-row justify-between items-center text-gray-500"><p>&copy; 2024 Dona Pop. Todos los derechos reservados.</p><div className="flex gap-6 mt-4 md:mt-0"><button onClick={onNavigateToTerms} className="hover:text-white cursor-pointer transition focus:outline-none focus:text-pink-400">Términos y Condiciones</button><button onClick={onNavigateToPrivacy} className="hover:text-white cursor-pointer transition focus:outline-none focus:text-pink-400">Política de Privacidad</button></div></div>
                 </div>
                 </footer>
             </div>
