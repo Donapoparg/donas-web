@@ -567,7 +567,51 @@
 
         const App = () => {
             const [currentView, setCurrentView] = useState('landing');
-            const views = { landing: <LandingPage onNavigateToRegister={() => setCurrentView('register')} onNavigateToTerms={() => setCurrentView('terms')} onNavigateToPrivacy={() => setCurrentView('privacy')} />, register: <CommerceForm onBack={() => setCurrentView('landing')} />, terms: <TermsPage onBack={() => setCurrentView('landing')} />, privacy: <PrivacyPage onBack={() => setCurrentView('landing')} /> };
+
+            // SOLUCIÓN: Manejo del Historial del Navegador (History API)
+            // Esto permite que el botón "Atrás" del celular y el gesto de deslizar funcionen
+            useEffect(() => {
+                // 1. Aseguramos que el estado inicial tenga una marca en el historial
+                window.history.replaceState({ view: 'landing' }, '');
+
+                // 2. Escuchamos el evento 'popstate' (cuando el usuario toca Atrás o desliza)
+                const handlePopState = (event) => {
+                    if (event.state && event.state.view) {
+                        // Si hay un estado guardado, volvemos a esa vista
+                        setCurrentView(event.state.view);
+                    } else {
+                        // Si por alguna razón no hay estado, volvemos seguro al landing
+                        setCurrentView('landing');
+                    }
+                };
+
+                window.addEventListener('popstate', handlePopState);
+                return () => window.removeEventListener('popstate', handlePopState);
+            }, []);
+
+            // Función para navegar hacia adelante (crea una entrada en el historial)
+            const navigateTo = (viewName) => {
+                window.history.pushState({ view: viewName }, ''); // Agrega al historial
+                setCurrentView(viewName);
+                window.scrollTo(0, 0); // Sube al inicio de la página
+            };
+
+            // Función para volver atrás (usa el historial del navegador)
+            const goBack = () => {
+                window.history.back(); // Esto dispara el evento 'popstate' automáticamente
+            };
+
+            const views = { 
+                landing: <LandingPage 
+                            onNavigateToRegister={() => navigateTo('register')} 
+                            onNavigateToTerms={() => navigateTo('terms')} 
+                            onNavigateToPrivacy={() => navigateTo('privacy')} 
+                         />, 
+                register: <CommerceForm onBack={goBack} />, 
+                terms: <TermsPage onBack={goBack} />, 
+                privacy: <PrivacyPage onBack={goBack} /> 
+            };
+            
             return views[currentView] || null;
         }
 
