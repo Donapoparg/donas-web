@@ -6,44 +6,40 @@
     <meta name="description" content="Dona Pop Mayorista - Sistematiza la venta de impulso con nuestros productos de alta rotación. Logística eficiente, rentabilidad asegurada y garantía de frescura.">
     <title>Dona Pop - Mayorista</title>
     
+    <!-- 🖼️ FAVICON CORREGIDO: Usando ruta absoluta para evitar problemas de caché y subdirectorio -->
     <link rel="icon" type="image/png" href="/donas-web/img/favicon.png">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico"> 
-
+    
+    <!-- ✅ CORRECCIÓN DE RENDIMIENTO: Preconexión para acelerar la carga de fuentes y módulos -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://esm.sh">
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <script src="https://cdn.tailwindcss.com" defer></script> 
+    <!-- Scripts con defer para no bloquear el renderizado -->
+    <script src="https://cdn.tailwindcss.com" defer></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js" defer></script>
 
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Poppins', 'sans-serif'],
+        // Configuración previa de Tailwind (se ejecutará cuando cargue el script)
+        window.tailwind = {
+            config: {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            sans: ['Poppins', 'sans-serif'],
+                        }
                     }
                 }
-            },
-            // 🟢 CORRECCIÓN CSS/TAILWIND: Agregar clases dinámicas a safelist para evitar que Tailwind las purgue
-            // Ej: text-pink-600, bg-pink-50, etc.
-            safelist: [
-                'text-pink-600', 'bg-pink-50', 'text-purple-600', 'bg-purple-50', 
-                'text-green-600', 'bg-green-50', 'text-yellow-600', 'bg-yellow-50',
-                'bg-pink-400/10', 'text-pink-400', 'bg-purple-400/10', 'text-purple-400',
-                'bg-blue-400/10', 'text-blue-400', 'text-orange-400', 'bg-orange-500/20', 'text-red-400',
-            ]
+            }
         }
     </script>
 </head>
-<body class="bg-white">
+<body class="bg-slate-900">
     <div id="root"></div>
 
+    <!-- type="text/babel" para que Babel lo procese -->
     <script type="text/babel" data-type="module">
         // USAMOS VERSIONES DE PRODUCCIÓN (sin ?dev) PARA MEJORAR EL RENDIMIENTO
-        import React, { useState, useEffect, useRef, memo, useCallback } from 'https://esm.sh/react@18.2.0';
+        import React, { useState, useEffect, useRef, memo } from 'https://esm.sh/react@18.2.0';
         import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client';
         import { 
             Send, Store, Phone, MapPin, Clock, ShoppingBag, ArrowLeft, 
@@ -55,36 +51,20 @@
         // ==========================================
         // UTILS
         // ==========================================
-        
-        // 🔴 CORRECCIÓN CRÍTICA (Rendimiento): useOnScreen original causaba "Reflow Forzado" (Layout Thrashing)
-        // La causa era que React accedía a ref.current dentro del useEffect, ANTES de que el componente terminara de renderizarse.
-        // Se cambió la implementación para que el cleanup sea robusto y se usa threshold: 0.1
         const useOnScreen = (ref, rootMargin = "0px") => {
             const [isIntersecting, setIntersecting] = useState(false);
-            
+            // NOTA: Este hook (que usa IntersectionObserver) es la causa del "Reflow Forzado". 
+            // La solución implica reestructurar el código de animación, lo cual es complejo sin un bundler.
             useEffect(() => {
-                const currentRef = ref.current;
-                if (!currentRef) return;
-
                 const observer = new IntersectionObserver(
-                    ([entry]) => {
-                        // 🟢 CORRECCIÓN: Usar requestAnimationFrame para evitar layout thrashing
-                        // Aunque IntersectionObserver es asíncrono, la actualización de estado a veces lo puede disparar. 
-                        // Es una práctica recomendada en ciertos contextos de animación para evitar reflow.
-                        requestAnimationFrame(() => {
-                            setIntersecting(entry.isIntersecting);
-                        });
-                    },
+                    ([entry]) => setIntersecting(entry.isIntersecting),
                     { rootMargin, threshold: 0.1 }
                 );
-                
-                observer.observe(currentRef);
-                
+                if (ref.current) observer.observe(ref.current);
                 return () => {
-                    if (currentRef) observer.unobserve(currentRef);
+                    if (ref.current) observer.unobserve(ref.current);
                 };
             }, [ref, rootMargin]);
-
             return isIntersecting;
         };
 
@@ -93,24 +73,19 @@
             const onScreen = useOnScreen(ref, "-20px");
             const [hasRevealed, setHasRevealed] = useState(false);
 
-            // 🟢 CORRECCIÓN: Agregar `delay` a las dependencias si se usa en la animación.
-            // Aunque `delay` es constante, React prefiere que los valores usados en lógica estén en deps.
             useEffect(() => {
-                if (onScreen && !hasRevealed) {
-                    setHasRevealed(true);
-                }
-            }, [onScreen, hasRevealed]); 
+                if (onScreen) setHasRevealed(true);
+            }, [onScreen]);
 
             return (
                 <div
-                    ref={ref}
-                    className={`transform transition-all duration-700 ease-[cubic-bezier(0.17, 0.55, 0.55, 1)] ${
-                        hasRevealed ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95"
-                    } ${className}`}
-                    // 🟢 CORRECCIÓN: Tailwind recomienda usar la clase `ease-[...]` en lugar del cubic-bezier directamente en `style`
-                    style={{ transitionDelay: `${delay}ms` }}
+                ref={ref}
+                className={`transform transition-all duration-700 cubic-bezier(0.17, 0.55, 0.55, 1) ${
+                    hasRevealed ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95"
+                } ${className}`}
+                style={{ transitionDelay: `${delay}ms` }}
                 >
-                    {children}
+                {children}
                 </div>
             );
         });
@@ -118,7 +93,6 @@
         // ==========================================
         // DATA
         // ==========================================
-        // ... (DATA se mantiene sin cambios)
         const DATA = {
             phoneNumber: "5491138235784", 
             whatsappLink: "https://wa.me/5491138235784?text=¡Hola Dona Pop! Quisiera solicitar más información sobre su propuesta comercial.",
@@ -160,9 +134,9 @@
         );
 
         const GlobalStyles = () => (
-            // 🟢 CORRECCIÓN CSS: Se eliminó el @import de fuentes ya que están en el <head>
-            // La clase .font-poppins se eliminó porque se estableció en tailwind.config
             <style>{`
+            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+            .font-poppins { font-family: 'Poppins', sans-serif; }
             .hero-bg {
                 background-color: #0f172a; 
                 background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
@@ -184,16 +158,10 @@
         // COMPONENTES DE PÁGINA
         // ==========================================
 
-        const HeaderSimple = memo(({ onBack }) => (
+        const HeaderSimple = ({ onBack }) => (
             <div className="bg-white shadow-sm sticky top-0 z-50">
             <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-                <div 
-                    className="flex items-center gap-2 text-pink-600 font-extrabold text-lg cursor-pointer" 
-                    onClick={onBack}
-                    // 🟢 CORRECCIÓN A11Y: Agregar role y aria-label
-                    role="button"
-                    aria-label="Volver a la página principal"
-                >
+                <div className="flex items-center gap-2 text-pink-600 font-extrabold text-lg cursor-pointer" onClick={onBack}>
                 <DonutIcon className="w-6 h-6" /> Dona Pop
                 </div>
                 <button 
@@ -205,13 +173,12 @@
                 </button>
             </div>
             </div>
-        ));
+        );
 
-        // ... (TermsPage y PrivacyPage se mantienen sin cambios notables en el contenido)
         const TermsPage = memo(({ onBack }) => {
             useEffect(() => window.scrollTo(0, 0), []);
             return (
-            <div className="min-h-screen bg-gray-50 font-sans text-gray-800 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="min-h-screen bg-gray-50 font-poppins text-gray-800 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <HeaderSimple onBack={onBack} />
                 <div className="max-w-4xl mx-auto px-4 py-10 md:py-16">
                 <div className="bg-white rounded-3xl shadow-xl p-6 md:p-12 border border-gray-100">
@@ -221,75 +188,75 @@
                     <p className="text-gray-600 text-sm font-medium tracking-wide uppercase">Suministro Mayorista</p>
                     </div>
                     <div className="space-y-8 text-gray-600 leading-relaxed text-sm md:text-base">
-                    <div className="bg-gray-50 p-5 rounded-xl border-l-4 border-pink-500">
-                        <h2 className="text-lg font-bold text-gray-900 mb-1">Programa de Abastecimiento "Siempre Fresco"</h2>
-                        <p>A continuación se detallan las condiciones que rigen la relación comercial entre el COMERCIO y el DISTRIBUIDOR Dona Pop.</p>
-                    </div>
-                    <section>
-                        <h3 className="flex items-center gap-3 text-lg font-bold text-gray-900 mb-4">
-                        <span className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-900 text-white text-xs shadow-md">1</span>
-                        Del Compromiso de Compra (Suscripción)
-                        </h3>
-                        <ul className="space-y-3 pl-4 border-l-2 border-gray-100 ml-3.5">
-                        <li>El <strong>COMERCIO</strong> adhiere al sistema de reposición automática.</li>
-                        <li>El <strong>DISTRIBUIDOR</strong> se compromete a visitar y abastecer el punto de venta los días <strong>Lunes y Jueves</strong>.</li>
-                        <li><strong>Unidad de Venta:</strong> El pedido estándar por visita es de 1 (una) Caja Master (contiene 8 bandejas surtidas).</li>
-                        </ul>
-                    </section>
-                    <section>
-                        <h3 className="flex items-center gap-3 text-lg font-bold text-gray-900 mb-4">
-                        <span className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-900 text-white text-xs shadow-md">2</span>
-                        Garantía de Frescura y Cambio (Política de "Scrap")
-                        </h3>
-                        <div className="pl-4 border-l-2 border-gray-100 ml-3.5 space-y-3">
-                        <p>Para eliminar el riesgo económico del COMERCIO, el DISTRIBUIDOR ofrece <strong>Garantía Total de Rotación (25%)</strong>:</p>
-                        <div className="bg-green-50 p-4 rounded-lg border border-green-100 flex items-start gap-3">
-                            <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                            <p className="text-green-800 font-medium text-sm">Se aceptará la devolución del 100% de los productos vencidos que no hayan sido vendidos.</p>
+                        <div className="bg-gray-50 p-5 rounded-xl border-l-4 border-pink-500">
+                            <h2 className="text-lg font-bold text-gray-900 mb-1">Programa de Abastecimiento "Siempre Fresco"</h2>
+                            <p>A continuación se detallan las condiciones que rigen la relación comercial entre el COMERCIO y el DISTRIBUIDOR Dona Pop.</p>
                         </div>
-                        <ul className="list-disc pl-5 space-y-2">
-                            <li><strong>Condición "Mano a Mano":</strong> El cambio se realiza exclusivamente contra la entrega de un nuevo pedido.</li>
-                            <li><strong>Estado del Producto:</strong> La mercadería a devolver debe estar en su envase original cerrado.</li>
-                        </ul>
-                        </div>
-                    </section>
-                    <section>
-                        <h3 className="flex items-center gap-3 text-lg font-bold text-gray-900 mb-4">
-                        <span className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-900 text-white text-xs shadow-md">3</span>
-                        Zona Protegida (Exclusividad)
-                        </h3>
-                        <div className="pl-4 border-l-2 border-gray-100 ml-3.5">
-                        <p className="mb-3">Mientras el COMERCIO mantenga su regularidad en la compra, el DISTRIBUIDOR otorga Exclusividad Zonal:</p>
-                        <div className="flex items-center gap-3 p-4 bg-yellow-50 rounded-lg border border-yellow-100 mb-3">
-                            <Lock className="w-5 h-5 text-yellow-600" />
-                            <p className="text-sm text-yellow-800 font-bold">No se venderá el producto a comercios del mismo rubro en un radio de 100 metros.</p>
-                        </div>
-                        <p className="text-xs text-gray-600 italic"><strong>Pérdida de Exclusividad:</strong> Si el COMERCIO suspende o rechaza un pedido programado sin aviso previo de 24hs.</p>
-                        </div>
-                    </section>
-                    <section>
-                        <h3 className="flex items-center gap-3 text-lg font-bold text-gray-900 mb-4">
-                        <span className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-900 text-white text-xs shadow-md">4</span>
-                        Precios y Pagos
-                        </h3>
-                        <ul className="space-y-3 pl-4 border-l-2 border-gray-100 ml-3.5">
-                        <li className="flex items-start gap-2">
-                            <span className="mt-2 w-1.5 h-1.5 bg-gray-400 rounded-full flex-shrink-0"></span>
-                            <span className="text-gray-600">La forma de pago es <strong>Contado Efectivo o Transferencia</strong> al momento de la entrega.</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                            <span className="mt-2 w-1.5 h-1.5 bg-gray-400 rounded-full flex-shrink-0"></span>
-                            <span className="text-gray-600">Los precios mayoristas están sujetos a variaciones de costos de materia prima.</span>
-                        </li>
-                        </ul>
-                    </section>
-                    <section>
-                        <h3 className="flex items-center gap-3 text-lg font-bold text-gray-900 mb-4">
-                        <span className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-900 text-white text-xs shadow-md">5</span>
-                        Duración y Baja
-                        </h3>
-                        <p className="pl-4 border-l-2 border-gray-100 ml-3.5">Este acuerdo no tiene plazo de permanencia forzosa. El COMERCIO puede darse de baja en cualquier momento avisando con anticipación.</p>
-                    </section>
+                        <section>
+                            <h3 className="flex items-center gap-3 text-lg font-bold text-gray-900 mb-4">
+                            <span className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-900 text-white text-xs shadow-md">1</span>
+                            Del Compromiso de Compra (Suscripción)
+                            </h3>
+                            <ul className="space-y-3 pl-4 border-l-2 border-gray-100 ml-3.5">
+                            <li>El <strong>COMERCIO</strong> adhiere al sistema de reposición automática.</li>
+                            <li>El <strong>DISTRIBUIDOR</strong> se compromete a visitar y abastecer el punto de venta los días <strong>Lunes y Jueves</strong>.</li>
+                            <li><strong>Unidad de Venta:</strong> El pedido estándar por visita es de 1 (una) Caja Master (contiene 8 bandejas surtidas).</li>
+                            </ul>
+                        </section>
+                        <section>
+                            <h3 className="flex items-center gap-3 text-lg font-bold text-gray-900 mb-4">
+                            <span className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-900 text-white text-xs shadow-md">2</span>
+                            Garantía de Frescura y Cambio (Política de "Scrap")
+                            </h3>
+                            <div className="pl-4 border-l-2 border-gray-100 ml-3.5 space-y-3">
+                            <p>Para eliminar el riesgo económico del COMERCIO, el DISTRIBUIDOR ofrece <strong>Garantía Total de Rotación (25%)</strong>:</p>
+                            <div className="bg-green-50 p-4 rounded-lg border border-green-100 flex items-start gap-3">
+                                <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                                <p className="text-green-800 font-medium text-sm">Se aceptará la devolución del 100% de los productos vencidos que no hayan sido vendidos.</p>
+                            </div>
+                            <ul className="list-disc pl-5 space-y-2">
+                                <li><strong>Condición "Mano a Mano":</strong> El cambio se realiza exclusivamente contra la entrega de un nuevo pedido.</li>
+                                <li><strong>Estado del Producto:</strong> La mercadería a devolver debe estar en su envase original cerrado.</li>
+                            </ul>
+                            </div>
+                        </section>
+                        <section>
+                            <h3 className="flex items-center gap-3 text-lg font-bold text-gray-900 mb-4">
+                            <span className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-900 text-white text-xs shadow-md">3</span>
+                            Zona Protegida (Exclusividad)
+                            </h3>
+                            <div className="pl-4 border-l-2 border-gray-100 ml-3.5">
+                            <p className="mb-3">Mientras el COMERCIO mantenga su regularidad en la compra, el DISTRIBUIDOR otorga Exclusividad Zonal:</p>
+                            <div className="flex items-center gap-3 p-4 bg-yellow-50 rounded-lg border border-yellow-100 mb-3">
+                                <Lock className="w-5 h-5 text-yellow-600" />
+                                <p className="text-sm text-yellow-800 font-bold">No se venderá el producto a comercios del mismo rubro en un radio de 100 metros.</p>
+                            </div>
+                            <p className="text-xs text-gray-600 italic"><strong>Pérdida de Exclusividad:</strong> Si el COMERCIO suspende o rechaza un pedido programado sin aviso previo de 24hs.</p>
+                            </div>
+                        </section>
+                        <section>
+                            <h3 className="flex items-center gap-3 text-lg font-bold text-gray-900 mb-4">
+                            <span className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-900 text-white text-xs shadow-md">4</span>
+                            Precios y Pagos
+                            </h3>
+                            <ul className="space-y-3 pl-4 border-l-2 border-gray-100 ml-3.5">
+                            <li className="flex items-start gap-2">
+                                <span className="mt-2 w-1.5 h-1.5 bg-gray-400 rounded-full flex-shrink-0"></span>
+                                <span className="text-gray-600">La forma de pago es <strong>Contado Efectivo o Transferencia</strong> al momento de la entrega.</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="mt-2 w-1.5 h-1.5 bg-gray-400 rounded-full flex-shrink-0"></span>
+                                <span className="text-gray-600">Los precios mayoristas están sujetos a variaciones de costos de materia prima.</span>
+                            </li>
+                            </ul>
+                        </section>
+                        <section>
+                            <h3 className="flex items-center gap-3 text-lg font-bold text-gray-900 mb-4">
+                            <span className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-900 text-white text-xs shadow-md">5</span>
+                            Duración y Baja
+                            </h3>
+                            <p className="pl-4 border-l-2 border-gray-100 ml-3.5">Este acuerdo no tiene plazo de permanencia forzosa. El COMERCIO puede darse de baja en cualquier momento avisando con anticipación.</p>
+                        </section>
                     </div>
                     <div className="mt-12 pt-8 border-t border-gray-100 text-center">
                     <button onClick={onBack} className="inline-flex items-center gap-2 bg-gray-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-gray-800 transition-all transform hover:-translate-y-1 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900">
@@ -305,7 +272,7 @@
         const PrivacyPage = memo(({ onBack }) => {
             useEffect(() => window.scrollTo(0, 0), []);
             return (
-            <div className="min-h-screen bg-gray-50 font-sans text-gray-800 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="min-h-screen bg-gray-50 font-poppins text-gray-800 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <HeaderSimple onBack={onBack} />
                 <div className="max-w-4xl mx-auto px-4 py-10 md:py-16">
                 <div className="bg-white rounded-3xl shadow-xl p-6 md:p-12 border border-gray-100">
@@ -315,36 +282,36 @@
                     <p className="text-gray-600 text-sm font-medium tracking-wide uppercase">Compromiso de Confidencialidad</p>
                     </div>
                     <div className="space-y-8 text-gray-600 leading-relaxed text-sm md:text-base">
-                    <div className="bg-gray-50 p-5 rounded-xl border-l-4 border-emerald-500">
-                        <p className="text-sm">En Dona Pop, valoramos y respetamos la privacidad de nuestros clientes comerciales.</p>
-                    </div>
-                    <section>
-                        <h3 className="text-lg font-bold text-gray-900 mb-3 border-b pb-2">1. Recopilación de Información</h3>
-                        <p className="mb-3">Para el proceso de alta de cliente mayorista, solicitamos únicamente la información necesaria:</p>
-                        <ul className="list-disc pl-5 space-y-1 text-sm">
-                        <li>Nombre del Comercio y del Responsable.</li>
-                        <li>Dirección física para la planificación de rutas.</li>
-                        <li>Número de teléfono para coordinación.</li>
-                        <li>Horarios de atención.</li>
-                        </ul>
-                    </section>
-                    <section>
-                        <h3 className="text-lg font-bold text-gray-900 mb-3 border-b pb-2">2. Uso de la Información</h3>
-                        <p className="mb-3">Los datos proporcionados se utilizan exclusivamente para procesar pedidos, comunicar novedades y gestionar facturación.</p>
-                        <p className="mt-3 text-sm font-semibold italic text-emerald-700">Nunca utilizaremos tus datos para enviar publicidad no deseada (spam).</p>
-                    </section>
-                    <section>
-                        <h3 className="text-lg font-bold text-gray-900 mb-3 border-b pb-2">3. Protección y No Divulgación</h3>
-                        <p>Dona Pop se compromete a no vender ni compartir la información de sus clientes con terceros, excepto logística.</p>
-                    </section>
-                    <section>
-                        <h3 className="text-lg font-bold text-gray-900 mb-3 border-b pb-2">4. Tus Derechos</h3>
-                        <p>Puedes solicitar la actualización o eliminación de tus datos en cualquier momento.</p>
-                    </section>
-                    <section>
-                        <h3 className="text-lg font-bold text-gray-900 mb-3 border-b pb-2">5. Contacto</h3>
-                        <p>Ante cualquier duda, puedes contactarnos a través de nuestro WhatsApp oficial.</p>
-                    </section>
+                        <div className="bg-gray-50 p-5 rounded-xl border-l-4 border-emerald-500">
+                            <p className="text-sm">En Dona Pop, valoramos y respetamos la privacidad de nuestros clientes comerciales.</p>
+                        </div>
+                        <section>
+                            <h3 className="text-lg font-bold text-gray-900 mb-3 border-b pb-2">1. Recopilación de Información</h3>
+                            <p className="mb-3">Para el proceso de alta de cliente mayorista, solicitamos únicamente la información necesaria:</p>
+                            <ul className="list-disc pl-5 space-y-1 text-sm">
+                            <li>Nombre del Comercio y del Responsable.</li>
+                            <li>Dirección física para la planificación de rutas.</li>
+                            <li>Número de teléfono para coordinación.</li>
+                            <li>Horarios de atención.</li>
+                            </ul>
+                        </section>
+                        <section>
+                            <h3 className="text-lg font-bold text-gray-900 mb-3 border-b pb-2">2. Uso de la Información</h3>
+                            <p className="mb-3">Los datos proporcionados se utilizan exclusivamente para procesar pedidos, comunicar novedades y gestionar facturación.</p>
+                            <p className="mt-3 text-sm font-semibold italic text-emerald-700">Nunca utilizaremos tus datos para enviar publicidad no deseada (spam).</p>
+                        </section>
+                        <section>
+                            <h3 className="text-lg font-bold text-gray-900 mb-3 border-b pb-2">3. Protección y No Divulgación</h3>
+                            <p>Dona Pop se compromete a no vender ni compartir la información de sus clientes con terceros, excepto logística.</p>
+                        </section>
+                        <section>
+                            <h3 className="text-lg font-bold text-gray-900 mb-3 border-b pb-2">4. Tus Derechos</h3>
+                            <p>Puedes solicitar la actualización o eliminación de tus datos en cualquier momento.</p>
+                        </section>
+                        <section>
+                            <h3 className="text-lg font-bold text-gray-900 mb-3 border-b pb-2">5. Contacto</h3>
+                            <p>Ante cualquier duda, puedes contactarnos a través de nuestro WhatsApp oficial.</p>
+                        </section>
                     </div>
                     <div className="mt-12 pt-8 border-t border-gray-100 text-center">
                     <button onClick={onBack} className="inline-flex items-center gap-2 bg-gray-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-gray-800 transition-all transform hover:-translate-y-1 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900">
@@ -359,17 +326,11 @@
 
         const CommerceForm = memo(({ onBack }) => {
             const [formData, setFormData] = useState({ nombreComercio: '', whatsapp: '', direccion: '', horario: '' });
-            const handleChange = useCallback((e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value })), []); // 🟢 CORRECCIÓN: Usar useCallback
+            const handleChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
             const handleSubmit = (e) => {
             e.preventDefault();
             const message = `¡Hola Dona Pop! 👋\n\nQuiero dar de alta mi comercio:\n\n🏪 *${formData.nombreComercio}*\n📱 ${formData.whatsapp}\n📍 ${formData.direccion}\n⏰ ${formData.horario}`;
-            // 🟢 CORRECCIÓN: Incluir window.open en try/catch por si el navegador bloquea el popup
-            try {
-                window.open(`https://wa.me/${DATA.phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
-            } catch (error) {
-                console.error("Error al abrir WhatsApp:", error);
-                alert("Por favor, habilita los pop-ups o copia el mensaje manualmente.");
-            }
+            window.open(`https://wa.me/${DATA.phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
             };
             useEffect(() => { window.scrollTo(0, 0); }, []);
 
@@ -389,12 +350,7 @@
                     <p className="text-pink-100 text-sm opacity-90">Completa tus datos para comenzar.</p>
                 </div>
                 <form onSubmit={handleSubmit} className="p-8 space-y-5">
-                    {[ 
-                        { label: "Nombre Comercio", name: "nombreComercio", icon: ShoppingBag, ph: "Ej. Kiosco El Paso", type: "text" }, 
-                        { label: "WhatsApp", name: "whatsapp", icon: Phone, ph: "Ej. 11 1234 5678", type: "tel" }, 
-                        { label: "Dirección", name: "direccion", icon: MapPin, ph: "Calle, Número, Localidad", type: "text" }, 
-                        { label: "Horario", name: "horario", icon: Clock, ph: "Ej. Lun a Vie 9-18hs", type: "text" } 
-                    ].map((field, idx) => (
+                    {[ { label: "Nombre Comercio", name: "nombreComercio", icon: ShoppingBag, ph: "Ej. Kiosco El Paso", type: "text" }, { label: "WhatsApp", name: "whatsapp", icon: Phone, ph: "Ej. 11 1234 5678", type: "tel" }, { label: "Dirección", name: "direccion", icon: MapPin, ph: "Calle, Número, Localidad", type: "text" }, { label: "Horario", name: "horario", icon: Clock, ph: "Ej. Lun a Vie 9-18hs", type: "text" } ].map((field, idx) => (
                         <div key={idx}>
                         <label htmlFor={field.name} className="block text-sm font-bold text-gray-700 mb-1.5 ml-1">{field.label}</label>
                         <div className="relative group">
@@ -429,11 +385,15 @@
             const [scrolled, setScrolled] = useState(false);
             const [openFaq, setOpenFaq] = useState(null);
 
-            // 🟢 CORRECCIÓN: Uso de useCallback para funciones que se pasan a hijos
-            const toggleFaq = useCallback((index) => setOpenFaq(openFaq === index ? null : index), [openFaq]);
+            useEffect(() => {
+            const handleScroll = () => setScrolled(window.scrollY > 20);
+            window.addEventListener('scroll', handleScroll, { passive: true });
+            return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            const toggleFaq = (index) => setOpenFaq(openFaq === index ? null : index);
             
-            // 🟢 CORRECCIÓN: Uso de useCallback para la función de scroll para evitar re-renderizados innecesarios en el memo
-            const scrollToSection = useCallback((e, id) => {
+            const scrollToSection = (e, id) => {
                 e.preventDefault();
                 const element = document.getElementById(id);
                 if (element) {
@@ -443,13 +403,7 @@
                     window.scrollTo({ top: offsetPosition, behavior: "smooth" });
                 }
                 setIsMobileMenuOpen(false);
-            }, []);
-
-            useEffect(() => {
-                const handleScroll = () => setScrolled(window.scrollY > 20);
-                window.addEventListener('scroll', handleScroll, { passive: true });
-                return () => window.removeEventListener('scroll', handleScroll);
-            }, []);
+            };
 
             return (
             <div className="font-sans text-gray-800 bg-white relative selection:bg-pink-100 selection:text-pink-900 overflow-x-hidden scroll-smooth">
@@ -465,17 +419,10 @@
                     <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 ease-in-out whitespace-nowrap font-bold text-sm hidden md:inline-block">Más Info</span>
                 </a>
 
-                <nav className={`fixed w-full z-40 font-sans transition-all duration-300 ${scrolled || isMobileMenuOpen ? 'bg-gray-900/95 backdrop-blur-md shadow-lg py-3' : 'bg-transparent py-4'}`}>
+                <nav className={`fixed w-full z-40 font-poppins transition-all duration-300 ${scrolled || isMobileMenuOpen ? 'bg-gray-900/95 backdrop-blur-md shadow-lg py-3' : 'bg-transparent py-4'}`}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-12">
-                    <div 
-                        className="flex items-center cursor-pointer z-50" 
-                        onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}
-                        role="button"
-                        aria-label="Volver al inicio"
-                    >
-                        <span className="text-2xl font-extrabold flex items-center gap-2 tracking-tight text-white hover:scale-105 transition-transform"><DonutIcon className="w-8 h-8 text-pink-500" /> Dona Pop</span>
-                    </div>
+                    <div className="flex items-center cursor-pointer z-50" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}><span className="text-2xl font-extrabold flex items-center gap-2 tracking-tight text-white hover:scale-105 transition-transform"><DonutIcon className="w-8 h-8 text-pink-500" /> Dona Pop</span></div>
                     <div className="hidden md:flex items-center space-x-6">
                         {['Beneficios', 'Productos', 'Rentabilidad', 'FAQ'].map((item) => (
                             <a 
@@ -524,38 +471,21 @@
                 <header className="hero-bg relative flex flex-col items-center justify-center w-full min-h-[90vh] md:min-h-screen overflow-hidden pt-20 pb-16">
                 <div className="w-full max-w-5xl mx-auto px-4 text-center flex flex-col items-center z-10 animate-in fade-in slide-in-from-bottom-10 duration-1000">
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 backdrop-blur-md border border-white/10 mb-6 animate-pulse shadow-lg ring-1 ring-white/10"><span className="flex h-2 w-2 relative"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-pink-500"></span></span><span className="text-pink-100 font-bold text-xs tracking-widest uppercase">Líderes en venta impulsiva</span></div>
-                    <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight font-sans tracking-tight drop-shadow-xl">Sistematiza la <br className="md:hidden" /><span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400">Venta de Impulso</span></h1>
+                    <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight font-poppins tracking-tight drop-shadow-xl">Sistematiza la <br className="md:hidden" /><span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400">Venta de Impulso</span></h1>
                     <p className="text-base sm:text-lg md:text-2xl text-gray-300 font-light mb-10 max-w-2xl mx-auto leading-relaxed px-2 drop-shadow-md">Transforma tu punto de venta en una máquina de rentabilidad automática. Logística inteligente, riesgo controlado y ganancias aseguradas.</p>
-                    <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-6 sm:px-0">
-                        <button 
-                            onClick={onNavigateToRegister} 
-                            className="w-full sm:w-auto bg-gradient-to-r from-pink-600 to-pink-500 text-white px-8 py-3.5 rounded-full text-lg font-bold hover:shadow-pink-500/30 hover:shadow-2xl transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2 active:scale-95 focus:outline-none focus:ring-4 focus:ring-pink-500/50"
-                        >
-                            Solicitar Alta <ArrowRight className="w-5 h-5" />
-                        </button>
-                        <button 
-                            onClick={(e) => scrollToSection(e, 'rentabilidad')} 
-                            className="w-full sm:w-auto bg-white/5 backdrop-blur-sm text-white border border-white/20 px-8 py-3.5 rounded-full text-lg font-bold hover:bg-white/10 transition-all flex items-center justify-center gap-2 active:scale-95 focus:outline-none focus:ring-4 focus:ring-white/50"
-                        >
-                            <BarChart3 className="w-5 h-5" /> Ver Rentabilidad
-                        </button>
-                    </div>
+                    <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-6 sm:px-0"><button onClick={onNavigateToRegister} className="w-full sm:w-auto bg-gradient-to-r from-pink-600 to-pink-500 text-white px-8 py-3.5 rounded-full text-lg font-bold hover:shadow-pink-500/30 hover:shadow-2xl transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2 active:scale-95 focus:outline-none focus:ring-4 focus:ring-pink-500/50">Solicitar Alta <ArrowRight className="w-5 h-5" /></button><button onClick={(e) => scrollToSection(e, 'rentabilidad')} className="w-full sm:w-auto bg-white/5 backdrop-blur-sm text-white border border-white/20 px-8 py-3.5 rounded-full text-lg font-bold hover:bg-white/10 transition-all flex items-center justify-center gap-2 active:scale-95 focus:outline-none focus:ring-4 focus:ring-white/50"><BarChart3 className="w-5 h-5" /> Ver Rentabilidad</button></div>
                 </div>
                 
                 {/* Scroll Indicator - CORREGIDO PARA MÓVIL */}
-                <div 
-                    className="absolute bottom-6 inset-x-0 mx-auto flex flex-col items-center justify-center animate-bounce text-white/50 cursor-pointer z-20" 
-                    onClick={(e) => scrollToSection(e, 'rentabilidad')}
-                    role="button"
-                    aria-label="Bajar a la sección de rentabilidad"
-                >
+                {/* Se usó 'inset-x-0' y 'justify-center' en lugar de translate para evitar conflicto con la animación */}
+                <div className="absolute bottom-6 inset-x-0 mx-auto flex flex-col items-center justify-center animate-bounce text-white/50 cursor-pointer z-20" onClick={(e) => scrollToSection(e, 'rentabilidad')}>
                     <span className="text-[10px] font-bold tracking-widest uppercase mb-1">Desliza</span>
                     <ChevronDown className="w-5 h-5" />
                 </div>
                 </header>
 
                 {/* PSICOLOGIA - Layout limpio - CORREGIDO: UL inválido cambiado a DIV */}
-                <section className="py-16 md:py-24 bg-gray-900 text-white font-sans relative">
+                <section className="py-16 md:py-24 bg-gray-900 text-white font-poppins relative">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
                     <div className="space-y-8">
@@ -566,16 +496,7 @@
                         <div className="space-y-6 mt-6">
                         {DATA.psychologyItems.map((item, index) => (
                             <Reveal key={index} delay={index * 150}>
-                            {/* 🟢 CORRECCIÓN A11Y: Se agregó role y aria-label al contenedor interactivo */}
-                            <div className="flex items-start group">
-                                <div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center mt-1 transition-transform group-hover:scale-110 ${item.bg}`}>
-                                    <item.icon className={`w-6 h-6 ${item.color}`} />
-                                </div>
-                                <div className="ml-5">
-                                    <h3 className={`text-lg font-bold mb-1 ${item.color}`}>{item.title}</h3>
-                                    <p className="text-gray-400 leading-relaxed text-sm">{item.desc}</p>
-                                </div>
-                            </div>
+                            <div className="flex items-start group"><div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center mt-1 transition-transform group-hover:scale-110 ${item.bg}`}><item.icon className={`w-6 h-6 ${item.color}`} /></div><div className="ml-5"><h3 className={`text-lg font-bold mb-1 ${item.color}`}>{item.title}</h3><p className="text-gray-400 leading-relaxed text-sm">{item.desc}</p></div></div>
                             </Reveal>
                         ))}
                         </div>
@@ -594,7 +515,7 @@
                 </section>
 
                 {/* DASHBOARD - Recuperado y Optimizado */}
-                <section id="rentabilidad" className="py-16 md:py-24 px-4 bg-white relative font-sans">
+                <section id="rentabilidad" className="py-16 md:py-24 px-4 bg-white relative font-poppins">
                 <div className="max-w-7xl mx-auto">
                     <Reveal><div className="text-center mb-12 max-w-4xl mx-auto"><div className="inline-flex items-center gap-2 bg-pink-50 px-4 py-1.5 rounded-full mb-6 text-xs font-bold tracking-widest uppercase text-pink-600 border border-pink-100"><BarChart3 className="w-4 h-4" /> Análisis Financiero</div><h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-6">Números que Hablan</h2><p className="text-gray-500 text-lg leading-relaxed">Transparencia total en los márgenes. Cada Caja Master representa una ganancia neta superior al <strong className="text-gray-900 font-bold">40%</strong>, convirtiendo tu mostrador en un activo de alta performance.</p></div></Reveal>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
@@ -626,7 +547,7 @@
                 </section>
 
                 {/* BENEFICIOS - Grid ajustado */}
-                <section id="beneficios" className="py-16 md:py-24 bg-slate-50 font-sans">
+                <section id="beneficios" className="py-16 md:py-24 bg-slate-50 font-poppins">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <Reveal><div className="text-center mb-12 max-w-3xl mx-auto"><h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">El Sistema que Automatiza tus Ventas</h2><p className="text-lg text-gray-500 leading-relaxed">Infraestructura logística completa diseñada para que ganes dinero sin complicaciones operativas.</p></div></Reveal>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -640,7 +561,7 @@
                 </section>
 
                 {/* GARANTIA - Layout compacto dos columnas, sin espacio blanco arriba */}
-                <section className="w-full bg-white font-sans border-t border-gray-100 pt-6 pb-16 md:pt-10 md:pb-24">
+                <section className="w-full bg-white font-poppins border-t border-gray-100 pt-6 pb-16 md:pt-10 md:pb-24">
                     <div className="max-w-7xl mx-auto px-6">
                         <Reveal>
                             <div className="max-w-5xl mx-auto">
@@ -657,16 +578,15 @@
                 </section>
 
                 {/* EMPAQUE - Visual - CARD REEMPLAZO IMAGEN - OPTIMIZADO */}
-                <section className="w-full flex flex-col lg:flex-row-reverse bg-gray-900 text-white overflow-hidden font-sans">
+                <section className="w-full flex flex-col lg:flex-row-reverse bg-gray-900 text-white overflow-hidden font-poppins">
                 <div className="lg:w-1/2 p-8 md:p-16 flex flex-col justify-center bg-gray-900"><Reveal><div className="max-w-lg mx-auto lg:mx-0 lg:ml-auto"><div className="inline-flex items-center gap-2 bg-pink-500/20 border border-pink-500/30 px-3 py-1 rounded-full mb-6 text-[10px] font-bold tracking-widest uppercase text-pink-300"><Layers className="w-3 h-3" /> Optimización</div><h2 className="text-3xl md:text-4xl font-extrabold mb-4 leading-tight">Empaque Inteligente y Apilable</h2><p className="text-gray-400 text-base mb-8 leading-relaxed">El diseño de nuestras cajas master no solo protege el producto, sino que también optimiza cada centímetro de tu espacio de venta y almacenamiento.</p><div className="grid grid-cols-1 sm:grid-cols-2 gap-4"><div className="bg-gray-800/50 p-5 rounded-2xl border border-gray-700"><Maximize className="w-6 h-6 text-pink-500 mb-3" /><h4 className="font-bold text-white text-base mb-1">Orden Total</h4><p className="text-xs text-gray-400">Reducción del desorden visual en depósito.</p></div><div className="bg-gray-800/50 p-5 rounded-2xl border border-gray-700"><Package className="w-6 h-6 text-purple-500 mb-3" /><h4 className="font-bold text-white text-base mb-1">100% Estibables</h4><p className="text-xs text-gray-400">Facilita el manejo y la organización.</p></div></div></div></Reveal></div>
                 <div className="lg:w-1/2 p-8 lg:p-16 flex items-center justify-center bg-gray-800/50">
                     <Reveal className="w-full max-w-lg">
                         <div className="bg-gray-800 border border-gray-700 rounded-3xl p-3 shadow-2xl hover:scale-[1.02] transition-transform duration-500">
                             <div className="bg-gray-900 rounded-2xl overflow-hidden relative">
-                                {/* 🟢 CORRECCIÓN A11Y: Agregar alt con descripción de la imagen */}
                                 <img 
                                     src="img/cajas.jpg" 
-                                    alt="Ilustración de las Cajas Master de Dona Pop apilables para optimizar el almacenamiento." 
+                                    alt="Cajas Master Apiladas" 
                                     width="564" height="426" 
                                     loading="lazy"
                                     className="w-full h-auto object-contain block transform hover:scale-105 transition-transform duration-700" 
@@ -682,78 +602,47 @@
                 </section>
 
                 {/* PRODUCTOS - OPTIMIZADO */}
-                <section id="productos" className="py-16 md:py-24 bg-white font-sans">
+                <section id="productos" className="py-16 md:py-24 bg-white font-poppins">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <Reveal><div className="text-center mb-12"><h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Líneas de Producto</h2><p className="text-lg text-gray-500">Diseñados visualmente para activar el gatillo de compra por impulso.</p></div></Reveal>
-                    <div className="mb-16">
-                        <Reveal>
-                            <div className="flex items-center gap-3 mb-8 pl-4 border-l-8 border-pink-500">
-                                <h3 className="text-2xl font-bold text-gray-900">Línea Dulce</h3>
-                                <span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-xs font-bold uppercase tracking-wider">Clásico</span>
-                            </div>
-                        </Reveal>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="mb-16"><Reveal><div className="flex items-center gap-3 mb-8 pl-4 border-l-8 border-pink-500"><h3 className="text-2xl font-bold text-gray-900">Línea Dulce</h3><span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-xs font-bold uppercase tracking-wider">Clásico</span></div></Reveal>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {[{ name: "Chocolate con Oreo", desc: "¡Fusión perfecta de chocolate y crujientes trozos de galleta Oreo! Una tentación irresistible.", tag: "Top Seller", color: "pink", icon: TrendingUp, image: "img/oreo.jpg" }, { name: "Vainilla con Chips", desc: "Vainilla con corazón de chips, baño rosa sabor frutilla y grageas. ¡Un placer visual!", tag: "Visual Impact", color: "purple", icon: Eye, image: "img/chips.jpg" }].map((prod, i) => (
                             <Reveal key={i} delay={(i + 1) * 150} className="group cursor-default hover:translate-y-[-5px] transition-transform duration-300">
                                 <div className="bg-gray-100 rounded-[2rem] overflow-hidden aspect-[16/9] relative mb-4 shadow-sm group-hover:shadow-lg transition-shadow">
-                                    {/* 🟢 CORRECCIÓN A11Y: Agregar alt con descripción de la imagen */}
                                     <img 
                                         src={prod.image} 
-                                        alt={`Dona sabor ${prod.name}`} 
+                                        alt={prod.name} 
                                         width="600" height="337" 
                                         loading="lazy"
                                         className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" 
                                     />
                                 </div>
-                                <h4 className={`text-xl font-bold text-gray-900 mb-1`}>{prod.name}</h4><p className="text-gray-500 leading-relaxed text-sm mb-3">{prod.desc}</p>
-                                {/* 🔴 CORRECCIÓN CSS/TAILWIND: Usar un color safe o un estilo dinámico que no sea purgado */}
-                                <span className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase ${prod.color === 'pink' ? 'text-pink-600 bg-pink-50' : 'text-purple-600 bg-purple-50'} px-2 py-1 rounded-md`}>
-                                    <prod.icon className="w-3 h-3"/> {prod.tag}
-                                </span>
+                                <h4 className={`text-xl font-bold text-gray-900 mb-1`}>{prod.name}</h4><p className="text-gray-500 leading-relaxed text-sm mb-3">{prod.desc}</p><span className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase text-${prod.color}-600 bg-${prod.color}-50 px-2 py-1 rounded-md`}><prod.icon className="w-3 h-3"/> {prod.tag}</span>
                             </Reveal>
                         ))}
-                        </div>
+                    </div>
                     </div>
                     <Reveal>
                     <div className="bg-gray-900 rounded-[2.5rem] overflow-hidden shadow-xl flex flex-col md:flex-row min-h-[400px] group">
                         <div className="md:w-1/2 relative bg-gray-800 min-h-[250px] overflow-hidden">
-                            {/* 🟢 CORRECCIÓN A11Y: Agregar alt con descripción de la imagen */}
                             <img 
                                 src="img/saladas.jpg" 
-                                alt="Dona salada con jamón, queso y topping de especias" 
+                                alt="Línea Salada" 
                                 width="600" height="400" 
                                 loading="lazy"
                                 className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-700 transform group-hover:scale-105" 
                             />
                             <div className="absolute top-6 left-6 z-20"><span className="bg-orange-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-widest inline-flex items-center gap-2 shadow-lg"><Flame className="w-3 h-3" /> Innovación</span></div>
                         </div>
-                        <div className="md:w-1/2 p-8 md:p-12 flex flex-col justify-center text-white relative">
-                            <div className="relative z-10">
-                                <h3 className="text-2xl md:text-3xl font-bold mb-4">El Snacking Salado</h3>
-                                <p className="text-gray-400 text-base mb-8 leading-relaxed">Rompemos el molde tradicional ofreciendo una alternativa salada de alta calidad para el antojo de mediodía.</p>
-                                <div className="space-y-4">
-                                    {[{ title: "Paleta y Queso Gratinado", sub: "El sabor familiar con un toque de pimienta.", icon: Utensils, color: "orange" }, { title: "Salame con Toque Picante", sub: "Intensidad premium con ají molido.", icon: Flame, color: "red" }].map((item, i) => (
-                                        <div key={i} className="flex items-start gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors border border-transparent hover:border-white/10">
-                                            {/* 🔴 CORRECCIÓN CSS/TAILWIND: Usar un color seguro o un estilo dinámico que no sea purgado */}
-                                            <div className={`p-2 ${item.color === 'orange' ? 'bg-orange-500/20 text-orange-400' : 'bg-red-500/20 text-red-400'} rounded-lg`}>
-                                                <item.icon className="w-5 h-5" />
-                                            </div>
-                                            <div>
-                                                <h4 className="font-bold text-base mb-0.5">{item.title}</h4>
-                                                <p className="text-gray-400 text-xs">{item.sub}</p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
+                        <div className="md:w-1/2 p-8 md:p-12 flex flex-col justify-center text-white relative"><div className="relative z-10"><h3 className="text-2xl md:text-3xl font-bold mb-4">El Snacking Salado</h3><p className="text-gray-400 text-base mb-8 leading-relaxed">Rompemos el molde tradicional ofreciendo una alternativa salada de alta calidad para el antojo de mediodía.</p><div className="space-y-4">{[{ title: "Paleta y Queso Gratinado", sub: "El sabor familiar con un toque de pimienta.", icon: Utensils, color: "orange" }, { title: "Salame con Toque Picante", sub: "Intensidad premium con ají molido.", icon: Flame, color: "red" }].map((item, i) => (<div key={i} className="flex items-start gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors border border-transparent hover:border-white/10"><div className={`p-2 bg-${item.color}-500/20 text-${item.color}-400 rounded-lg`}><item.icon className="w-5 h-5" /></div><div><h4 className="font-bold text-base mb-0.5">{item.title}</h4><p className="text-gray-400 text-xs">{item.sub}</p></div></div>))}</div></div></div>
                     </div>
                     </Reveal>
                 </div>
                 </section>
 
                 {/* FAQ */}
-                <section id="faq" className="py-16 bg-gray-50 border-t border-gray-100 font-sans">
+                <section id="faq" className="py-16 bg-gray-50 border-t border-gray-100 font-poppins">
                 <div className="max-w-3xl mx-auto px-6">
                     <Reveal><div className="text-center mb-10"><h2 className="text-2xl md:text-4xl font-bold text-gray-900 mb-3 tracking-tight">Preguntas Frecuentes</h2><p className="text-base text-gray-500">Todo lo que necesitas saber antes de empezar.</p></div></Reveal>
                     <div className="space-y-3">
@@ -783,17 +672,14 @@
                 </section>
 
                 {/* FOOTER */}
-                <footer className="bg-gray-900 text-white py-12 border-t border-gray-800 font-sans text-sm">
+                <footer className="bg-gray-900 text-white py-12 border-t border-gray-800 font-poppins text-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-6">
                     <div className="text-center md:text-left"><span className="text-2xl font-extrabold text-white flex items-center justify-center md:justify-start gap-2 hover:text-pink-500 transition-colors cursor-pointer"><DonutIcon className="w-6 h-6" /> Dona Pop</span><p className="text-gray-300 mt-2">Sistematizando la venta por impulso en Argentina. <br/> Logística eficiente, rentabilidad asegurada.</p></div>
                     <div className="flex flex-col items-center md:items-end gap-3"><p className="text-gray-300">¿Dudas? Escríbenos directamente</p><a href={DATA.whatsappLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white bg-green-600 hover:bg-green-700 px-5 py-2.5 rounded-full font-bold transition-colors hover:shadow-lg hover:shadow-green-500/20 focus:outline-none focus:ring-2 focus:ring-4 focus:ring-green-400">
                     <WhatsAppIcon className="w-4 h-4" /> Iniciar Chat WhatsApp</a></div>
                     </div>
-                    <div className="mt-8 border-t border-gray-800 pt-6 flex flex-col md:flex-row justify-between items-center text-gray-300"><p>&copy; 2024 Dona Pop. Todos los derechos reservados.</p><div className="flex gap-6 mt-4 md:mt-0">
-                        <button onClick={onNavigateToTerms} className="hover:text-white cursor-pointer transition focus:outline-none focus:text-pink-400">Términos y Condiciones</button>
-                        <button onClick={onNavigateToPrivacy} className="hover:text-white cursor-pointer transition focus:outline-none focus:text-pink-400">Política de Privacidad</button>
-                    </div></div>
+                    <div className="mt-8 border-t border-gray-800 pt-6 flex flex-col md:flex-row justify-between items-center text-gray-300"><p>&copy; 2024 Dona Pop. Todos los derechos reservados.</p><div className="flex gap-6 mt-4 md:mt-0"><button onClick={onNavigateToTerms} className="hover:text-white cursor-pointer transition focus:outline-none focus:text-pink-400">Términos y Condiciones</button><button onClick={onNavigateToPrivacy} className="hover:text-white cursor-pointer transition focus:outline-none focus:text-pink-400">Política de Privacidad</button></div></div>
                 </div>
                 </footer>
             </div>
@@ -803,52 +689,45 @@
         const App = () => {
             const [currentView, setCurrentView] = useState('landing');
 
-            // 🟢 CORRECCIÓN: Uso de useCallback para funciones de navegación
-            const navigateTo = useCallback((viewName) => {
-                // 🟢 CORRECCIÓN: Si ya estamos en la vista, no agregamos al historial
-                if (currentView === viewName) return; 
-
-                // 🔴 CORRECCIÓN CRÍTICA: Se debe verificar si 'history.state' es nulo,
-                // ya que history.replaceState en la primera carga podría causar problemas de navegación.
-                // Usar window.history.pushState para avanzar
-                window.history.pushState({ view: viewName }, '', `#${viewName}`); 
-                setCurrentView(viewName);
-                window.scrollTo(0, 0);
-            }, [currentView]); // Dependencia currentView
-
-            // 🟢 CORRECCIÓN: Uso de useCallback
-            const goBack = useCallback(() => {
-                // 🟢 CORRECCIÓN: Si la vista actual es 'landing', no hacemos nada o salimos.
-                if (currentView === 'landing') return; 
-
-                window.history.back(); // Esto dispara el evento 'popstate' automáticamente
-            }, [currentView]);
-
             // SOLUCIÓN: Manejo del Historial del Navegador (History API)
+            // Esto permite que el botón "Atrás" del celular y el gesto de deslizar funcionen
             useEffect(() => {
-                // 1. Reemplazar el estado inicial con la vista actual al cargar
-                window.history.replaceState({ view: currentView }, '', currentView === 'landing' ? window.location.pathname : `#${currentView}`);
+                // 1. Aseguramos que el estado inicial tenga una marca en el historial
+                window.history.replaceState({ view: 'landing' }, '');
 
                 // 2. Escuchamos el evento 'popstate' (cuando el usuario toca Atrás o desliza)
                 const handlePopState = (event) => {
-                    const viewFromHistory = event.state && event.state.view ? event.state.view : 'landing';
-                    // 🟢 CORRECCIÓN: Usamos requestAnimationFrame para asegurar que el cambio de estado 
-                    // no cause un Reflow Forzado debido a las animaciones de salida.
-                    requestAnimationFrame(() => {
-                        setCurrentView(viewFromHistory);
-                    });
+                    if (event.state && event.state.view) {
+                        // Si hay un estado guardado, volvemos a esa vista
+                        setCurrentView(event.state.view);
+                    } else {
+                        // Si por alguna razón no hay estado, volvemos seguro al landing
+                        setCurrentView('landing');
+                    }
                 };
 
                 window.addEventListener('popstate', handlePopState);
                 return () => window.removeEventListener('popstate', handlePopState);
-            }, [currentView]);
+            }, []);
+
+            // Función para navegar hacia adelante (crea una entrada en el historial)
+            const navigateTo = (viewName) => {
+                window.history.pushState({ view: viewName }, ''); // Agrega al historial
+                setCurrentView(viewName);
+                window.scrollTo(0, 0); // Sube al inicio de la página
+            };
+
+            // Función para volver atrás (usa el historial del navegador)
+            const goBack = () => {
+                window.history.back(); // Esto dispara el evento 'popstate' automáticamente
+            };
 
             const views = { 
                 landing: <LandingPage 
-                                onNavigateToRegister={() => navigateTo('register')} 
-                                onNavigateToTerms={() => navigateTo('terms')} 
-                                onNavigateToPrivacy={() => navigateTo('privacy')} 
-                            />, 
+                            onNavigateToRegister={() => navigateTo('register')} 
+                            onNavigateToTerms={() => navigateTo('terms')} 
+                            onNavigateToPrivacy={() => navigateTo('privacy')} 
+                         />, 
                 register: <CommerceForm onBack={goBack} />, 
                 terms: <TermsPage onBack={goBack} />, 
                 privacy: <PrivacyPage onBack={goBack} /> 
@@ -862,3 +741,4 @@
     </script>
 </body>
 </html>
+
