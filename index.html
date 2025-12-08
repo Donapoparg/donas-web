@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dona Pop Mayorista - Sistematiza la venta de impulso con nuestros productos de alta rotación. Logística eficiente, rentabilidad asegurada y garantía de frescura.">
+    <title>Dona Pop - Mayorista</title>
     
-    <meta name="description" content="Mini donas Donapop: el mejor precio mayorista en Zona Oeste, Paso del Rey, Buenos Aires. Especialistas en eventos y distribuidores en toda Argentina.">
-    <title>Donapop | Mini Donas Mayoristas en Paso del Rey, Zona Oeste Argentina</title>
-    
+    <!-- Scripts con defer para no bloquear el renderizado -->
     <script src="https://cdn.tailwindcss.com" defer></script>
-    
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js" defer></script>
+
     <script>
-        // Configuración previa de Tailwind (debe quedar)
+        // Configuración previa de Tailwind (se ejecutará cuando cargue el script)
         window.tailwind = {
             config: {
                 theme: {
@@ -27,7 +28,705 @@
 <body class="bg-slate-900">
     <div id="root"></div>
 
-    <script src="./app.js" type="module" defer></script>
-    
-    </body>
+    <!-- type="text/babel" para que Babel lo procese -->
+    <script type="text/babel" data-type="module">
+        // USAMOS VERSIONES DE PRODUCCIÓN (sin ?dev) PARA MEJORAR EL RENDIMIENTO
+        import React, { useState, useEffect, useRef, memo } from 'https://esm.sh/react@18.2.0';
+        import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client';
+        import { 
+            Send, Store, Phone, MapPin, Clock, ShoppingBag, ArrowLeft, 
+            Menu, X, ArrowRight, RefreshCw, Package, ShieldCheck, 
+            Eye, Calculator, Tags, TrendingUp, BarChart3, Lock, Coins, CheckCircle2, Flame, Utensils, 
+            Layers, Maximize, FileText, Shield, HelpCircle, ChevronDown, ChevronUp
+        } from 'https://esm.sh/lucide-react@0.292.0';
+
+        // ==========================================
+        // UTILS
+        // ==========================================
+        const useOnScreen = (ref, rootMargin = "0px") => {
+            const [isIntersecting, setIntersecting] = useState(false);
+            useEffect(() => {
+                const observer = new IntersectionObserver(
+                    ([entry]) => setIntersecting(entry.isIntersecting),
+                    { rootMargin, threshold: 0.1 }
+                );
+                if (ref.current) observer.observe(ref.current);
+                return () => {
+                    if (ref.current) observer.unobserve(ref.current);
+                };
+            }, [ref, rootMargin]);
+            return isIntersecting;
+        };
+
+        const Reveal = memo(({ children, delay = 0, className = "" }) => {
+            const ref = useRef();
+            const onScreen = useOnScreen(ref, "-20px");
+            const [hasRevealed, setHasRevealed] = useState(false);
+
+            useEffect(() => {
+                if (onScreen) setHasRevealed(true);
+            }, [onScreen]);
+
+            return (
+                <div
+                ref={ref}
+                className={`transform transition-all duration-700 cubic-bezier(0.17, 0.55, 0.55, 1) ${
+                    hasRevealed ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95"
+                } ${className}`}
+                style={{ transitionDelay: `${delay}ms` }}
+                >
+                {children}
+                </div>
+            );
+        });
+
+        // ==========================================
+        // DATA
+        // ==========================================
+        const DATA = {
+            phoneNumber: "5491138235784", 
+            whatsappLink: "https://wa.me/5491138235784?text=¡Hola Dona Pop! Quisiera solicitar más información sobre su propuesta comercial.",
+            psychologyItems: [
+                { icon: Eye, title: "Atractivo Visual", desc: "Packaging vibrante y colores contrastantes que capturan la mirada en menos de 0.5 segundos.", color: "text-pink-400", bg: "bg-pink-400/10" },
+                { icon: Calculator, title: "Ubicación Estratégica", desc: "Diseñado para zonas calientes de alto tráfico (caja/mostrador). Decisión rápida, emocional y sin fricción.", color: "text-purple-400", bg: "bg-purple-400/10" },
+                { icon: Tags, title: "Precio Impulso", desc: "Ticket accesible percibido como un 'pequeño lujo'. Compra sencilla y sin culpa para el consumidor.", color: "text-blue-400", bg: "bg-blue-400/10" }
+            ],
+            statsItems: [
+                { icon: RefreshCw, title: "2x Entregas/Semana", desc: "Reposición automática lunes y jueves.", color: "text-purple-600", bg: "bg-purple-50" },
+                { icon: Lock, title: "100m Radio Exclusivo", desc: "Zona protegida contra competencia.", color: "text-pink-600", bg: "bg-pink-50" }
+            ],
+            benefitsItems: [
+                { icon: RefreshCw, title: "Reposición Inteligente", desc: "Visitamos tu local lunes y jueves. Olvídate de gestionar pedidos o quedarte sin stock.", color: "text-pink-600", bg: "bg-pink-50" },
+                { icon: Package, title: "Logística Pro", desc: "Cajas Master de 8 bandejas, estibables y optimizadas para espacios reducidos de retail.", color: "text-purple-600", bg: "bg-purple-50" },
+                { icon: ShieldCheck, title: "Riesgo Minimizado", desc: "Aceptamos devoluciones de hasta el 25% del producto vencido. Tu inversión está protegida.", color: "text-green-600", bg: "bg-green-50" },
+                { icon: MapPin, title: "Exclusividad Zonal", desc: "Bloqueo de competencia en 100 metros. Protegemos tu margen y evitamos la saturación.", color: "text-yellow-600", bg: "bg-yellow-50" }
+            ],
+            faqItems: [
+                { question: "¿Cuál es la compra mínima?", answer: "La unidad mínima de pedido es 1 Caja Master, la cual contiene 8 bandejas surtidas listas para exhibir. Esto asegura variedad en tu mostrador." },
+                { question: "¿Cómo funciona el cambio de mercadería?", answer: "Te reconocemos hasta el 25% de los productos vencidos. El cambio se realiza 'mano a mano' al entregar el nuevo pedido, siempre que el envase esté cerrado." },
+                { question: "¿Cuándo visitan mi comercio?", answer: "Realizamos visitas fijas los días Lunes y Jueves para asegurar que siempre tengas producto fresco para el fin de semana y el inicio de semana." },
+                { question: "¿Tengo exclusividad en mi zona?", answer: "Sí. Mientras mantengas tu compra regular, bloqueamos la venta a otros comercios del mismo rubro en un radio de 100 metros a la redonda." },
+                { question: "¿Cuáles son los medios de pago?", answer: "Aceptamos efectivo y transferencia bancaria al momento de la entrega de la mercadería. No trabajamos con cuentas corrientes." },
+                { question: "¿Los productos necesitan refrigeración?", answer: "Aunque se mantienen bien en ambiente fresco (20-25°C), recomendamos preferentemente exhibirlos en frío, idealmente en una heladera de exhibición de panadería, para potenciar su frescura y calidad visual." }
+            ]
+        };
+
+        const DonutIcon = ({ className }) => (
+            <svg viewBox="0 0 24 24" fill="currentColor" className={className} xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM12 18C8.68629 18 6 15.3137 6 12C6 8.68629 8.68629 6 12 6C15.3137 6 18 8.68629 18 12C18 15.3137 15.3137 18 12 18Z" />
+            </svg>
+        );
+
+        const WhatsAppIcon = ({ className }) => (
+            <svg viewBox="0 0 24 24" fill="currentColor" className={className} xmlns="http://www.w3.org/2000/svg">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+            </svg>
+        );
+
+        const GlobalStyles = () => (
+            <style>{`
+            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+            .font-poppins { font-family: 'Poppins', sans-serif; }
+            .hero-bg {
+                background-color: #0f172a; 
+                background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+                background-size: 40px 40px;
+                position: relative;
+            }
+            .hero-bg::before {
+                content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+                background: radial-gradient(circle at 50% 40%, rgba(219, 39, 119, 0.15) 0%, transparent 60%);
+                pointer-events: none;
+            }
+            .pattern-dots { background-image: radial-gradient(#db2777 1px, transparent 1px); background-size: 24px 24px; }
+            @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+            .animate-float { animation: float 6s ease-in-out infinite; }
+            `}</style>
+        );
+
+        // ==========================================
+        // COMPONENTES DE PÁGINA
+        // ==========================================
+
+        const HeaderSimple = ({ onBack }) => (
+            <div className="bg-white shadow-sm sticky top-0 z-50">
+            <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+                <div className="flex items-center gap-2 text-pink-600 font-extrabold text-lg cursor-pointer" onClick={onBack}>
+                <DonutIcon className="w-6 h-6" /> Dona Pop
+                </div>
+                <button 
+                    onClick={onBack} 
+                    aria-label="Volver atrás"
+                    className="flex items-center gap-2 text-xs font-semibold text-gray-600 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500"
+                >
+                <ArrowLeft className="w-4 h-4" /> Volver
+                </button>
+            </div>
+            </div>
+        );
+
+        const TermsPage = memo(({ onBack }) => {
+            useEffect(() => window.scrollTo(0, 0), []);
+            return (
+            <div className="min-h-screen bg-gray-50 font-poppins text-gray-800 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <HeaderSimple onBack={onBack} />
+                <div className="max-w-4xl mx-auto px-4 py-10 md:py-16">
+                <div className="bg-white rounded-3xl shadow-xl p-6 md:p-12 border border-gray-100">
+                    <div className="text-center mb-10">
+                    <div className="inline-flex p-3 bg-pink-50 text-pink-600 rounded-xl mb-4"><FileText className="w-8 h-8" /></div>
+                    <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Términos y Condiciones</h1>
+                    <p className="text-gray-600 text-sm font-medium tracking-wide uppercase">Suministro Mayorista</p>
+                    </div>
+                    <div className="space-y-8 text-gray-600 leading-relaxed text-sm md:text-base">
+                        <div className="bg-gray-50 p-5 rounded-xl border-l-4 border-pink-500">
+                            <h2 className="text-lg font-bold text-gray-900 mb-1">Programa de Abastecimiento "Siempre Fresco"</h2>
+                            <p>A continuación se detallan las condiciones que rigen la relación comercial entre el COMERCIO y el DISTRIBUIDOR Dona Pop.</p>
+                        </div>
+                        <section>
+                            <h3 className="flex items-center gap-3 text-lg font-bold text-gray-900 mb-4">
+                            <span className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-900 text-white text-xs shadow-md">1</span>
+                            Del Compromiso de Compra (Suscripción)
+                            </h3>
+                            <ul className="space-y-3 pl-4 border-l-2 border-gray-100 ml-3.5">
+                            <li>El <strong>COMERCIO</strong> adhiere al sistema de reposición automática.</li>
+                            <li>El <strong>DISTRIBUIDOR</strong> se compromete a visitar y abastecer el punto de venta los días <strong>Lunes y Jueves</strong>.</li>
+                            <li><strong>Unidad de Venta:</strong> El pedido estándar por visita es de 1 (una) Caja Master (contiene 8 bandejas surtidas).</li>
+                            </ul>
+                        </section>
+                        <section>
+                            <h3 className="flex items-center gap-3 text-lg font-bold text-gray-900 mb-4">
+                            <span className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-900 text-white text-xs shadow-md">2</span>
+                            Garantía de Frescura y Cambio (Política de "Scrap")
+                            </h3>
+                            <div className="pl-4 border-l-2 border-gray-100 ml-3.5 space-y-3">
+                            <p>Para eliminar el riesgo económico del COMERCIO, el DISTRIBUIDOR ofrece <strong>Garantía Total de Rotación (25%)</strong>:</p>
+                            <div className="bg-green-50 p-4 rounded-lg border border-green-100 flex items-start gap-3">
+                                <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                                <p className="text-green-800 font-medium text-sm">Se aceptará la devolución del 100% de los productos vencidos que no hayan sido vendidos.</p>
+                            </div>
+                            <ul className="list-disc pl-5 space-y-2">
+                                <li><strong>Condición "Mano a Mano":</strong> El cambio se realiza exclusivamente contra la entrega de un nuevo pedido.</li>
+                                <li><strong>Estado del Producto:</strong> La mercadería a devolver debe estar en su envase original cerrado.</li>
+                            </ul>
+                            </div>
+                        </section>
+                        <section>
+                            <h3 className="flex items-center gap-3 text-lg font-bold text-gray-900 mb-4">
+                            <span className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-900 text-white text-xs shadow-md">3</span>
+                            Zona Protegida (Exclusividad)
+                            </h3>
+                            <div className="pl-4 border-l-2 border-gray-100 ml-3.5">
+                            <p className="mb-3">Mientras el COMERCIO mantenga su regularidad en la compra, el DISTRIBUIDOR otorga Exclusividad Zonal:</p>
+                            <div className="flex items-center gap-3 p-4 bg-yellow-50 rounded-lg border border-yellow-100 mb-3">
+                                <Lock className="w-5 h-5 text-yellow-600" />
+                                <p className="text-sm text-yellow-800 font-bold">No se venderá el producto a comercios del mismo rubro en un radio de 100 metros.</p>
+                            </div>
+                            <p className="text-xs text-gray-600 italic"><strong>Pérdida de Exclusividad:</strong> Si el COMERCIO suspende o rechaza un pedido programado sin aviso previo de 24hs.</p>
+                            </div>
+                        </section>
+                        <section>
+                            <h3 className="flex items-center gap-3 text-lg font-bold text-gray-900 mb-4">
+                            <span className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-900 text-white text-xs shadow-md">4</span>
+                            Precios y Pagos
+                            </h3>
+                            <ul className="space-y-3 pl-4 border-l-2 border-gray-100 ml-3.5">
+                            <li className="flex items-start gap-2">
+                                <span className="mt-2 w-1.5 h-1.5 bg-gray-400 rounded-full flex-shrink-0"></span>
+                                <span className="text-gray-600">La forma de pago es <strong>Contado Efectivo o Transferencia</strong> al momento de la entrega.</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="mt-2 w-1.5 h-1.5 bg-gray-400 rounded-full flex-shrink-0"></span>
+                                <span className="text-gray-600">Los precios mayoristas están sujetos a variaciones de costos de materia prima.</span>
+                            </li>
+                            </ul>
+                        </section>
+                        <section>
+                            <h3 className="flex items-center gap-3 text-lg font-bold text-gray-900 mb-4">
+                            <span className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-900 text-white text-xs shadow-md">5</span>
+                            Duración y Baja
+                            </h3>
+                            <p className="pl-4 border-l-2 border-gray-100 ml-3.5">Este acuerdo no tiene plazo de permanencia forzosa. El COMERCIO puede darse de baja en cualquier momento avisando con anticipación.</p>
+                        </section>
+                    </div>
+                    <div className="mt-12 pt-8 border-t border-gray-100 text-center">
+                    <button onClick={onBack} className="inline-flex items-center gap-2 bg-gray-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-gray-800 transition-all transform hover:-translate-y-1 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900">
+                        Entendido, Volver al Sitio
+                    </button>
+                    </div>
+                </div>
+                </div>
+            </div>
+            );
+        });
+
+        const PrivacyPage = memo(({ onBack }) => {
+            useEffect(() => window.scrollTo(0, 0), []);
+            return (
+            <div className="min-h-screen bg-gray-50 font-poppins text-gray-800 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <HeaderSimple onBack={onBack} />
+                <div className="max-w-4xl mx-auto px-4 py-10 md:py-16">
+                <div className="bg-white rounded-3xl shadow-xl p-6 md:p-12 border border-gray-100">
+                    <div className="text-center mb-10">
+                    <div className="inline-flex p-3 bg-emerald-50 text-emerald-600 rounded-xl mb-4"><Shield className="w-8 h-8" /></div>
+                    <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Política de Privacidad</h1>
+                    <p className="text-gray-600 text-sm font-medium tracking-wide uppercase">Compromiso de Confidencialidad</p>
+                    </div>
+                    <div className="space-y-8 text-gray-600 leading-relaxed text-sm md:text-base">
+                        <div className="bg-gray-50 p-5 rounded-xl border-l-4 border-emerald-500">
+                            <p className="text-sm">En Dona Pop, valoramos y respetamos la privacidad de nuestros clientes comerciales.</p>
+                        </div>
+                        <section>
+                            <h3 className="text-lg font-bold text-gray-900 mb-3 border-b pb-2">1. Recopilación de Información</h3>
+                            <p className="mb-3">Para el proceso de alta de cliente mayorista, solicitamos únicamente la información necesaria:</p>
+                            <ul className="list-disc pl-5 space-y-1 text-sm">
+                            <li>Nombre del Comercio y del Responsable.</li>
+                            <li>Dirección física para la planificación de rutas.</li>
+                            <li>Número de teléfono para coordinación.</li>
+                            <li>Horarios de atención.</li>
+                            </ul>
+                        </section>
+                        <section>
+                            <h3 className="text-lg font-bold text-gray-900 mb-3 border-b pb-2">2. Uso de la Información</h3>
+                            <p className="mb-3">Los datos proporcionados se utilizan exclusivamente para procesar pedidos, comunicar novedades y gestionar facturación.</p>
+                            <p className="mt-3 text-sm font-semibold italic text-emerald-700">Nunca utilizaremos tus datos para enviar publicidad no deseada (spam).</p>
+                        </section>
+                        <section>
+                            <h3 className="text-lg font-bold text-gray-900 mb-3 border-b pb-2">3. Protección y No Divulgación</h3>
+                            <p>Dona Pop se compromete a no vender ni compartir la información de sus clientes con terceros, excepto logística.</p>
+                        </section>
+                        <section>
+                            <h3 className="text-lg font-bold text-gray-900 mb-3 border-b pb-2">4. Tus Derechos</h3>
+                            <p>Puedes solicitar la actualización o eliminación de tus datos en cualquier momento.</p>
+                        </section>
+                        <section>
+                            <h3 className="text-lg font-bold text-gray-900 mb-3 border-b pb-2">5. Contacto</h3>
+                            <p>Ante cualquier duda, puedes contactarnos a través de nuestro WhatsApp oficial.</p>
+                        </section>
+                    </div>
+                    <div className="mt-12 pt-8 border-t border-gray-100 text-center">
+                    <button onClick={onBack} className="inline-flex items-center gap-2 bg-gray-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-gray-800 transition-all transform hover:-translate-y-1 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900">
+                        Entendido, Volver al Sitio
+                    </button>
+                    </div>
+                </div>
+                </div>
+            </div>
+            );
+        });
+
+        const CommerceForm = memo(({ onBack }) => {
+            const [formData, setFormData] = useState({ nombreComercio: '', whatsapp: '', direccion: '', horario: '' });
+            const handleChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+            const handleSubmit = (e) => {
+            e.preventDefault();
+            const message = `¡Hola Dona Pop! 👋\n\nQuiero dar de alta mi comercio:\n\n🏪 *${formData.nombreComercio}*\n📱 ${formData.whatsapp}\n📍 ${formData.direccion}\n⏰ ${formData.horario}`;
+            window.open(`https://wa.me/${DATA.phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
+            };
+            useEffect(() => { window.scrollTo(0, 0); }, []);
+
+            return (
+            <div className="min-h-screen bg-pink-50/50 font-sans text-gray-800 p-4 flex items-center justify-center animate-in fade-in slide-in-from-right duration-300 pattern-dots pt-24 md:pt-10">
+                <main className="w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden border border-white ring-1 ring-black/5 relative">
+                <div className="bg-gradient-to-br from-pink-600 to-purple-700 p-8 text-white text-center relative">
+                    <button 
+                        onClick={onBack} 
+                        aria-label="Volver atrás"
+                        className="absolute left-6 top-6 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white"
+                    >
+                        <ArrowLeft className="w-5 h-5" />
+                    </button>
+                    <div className="flex justify-center mb-4"><div className="p-3 bg-white/10 rounded-2xl backdrop-blur-sm animate-float"><Store className="w-8 h-8 text-white" /></div></div>
+                    <h1 className="text-2xl font-bold tracking-tight mb-2">Alta de Comercio</h1>
+                    <p className="text-pink-100 text-sm opacity-90">Completa tus datos para comenzar.</p>
+                </div>
+                <form onSubmit={handleSubmit} className="p-8 space-y-5">
+                    {[ { label: "Nombre Comercio", name: "nombreComercio", icon: ShoppingBag, ph: "Ej. Kiosco El Paso", type: "text" }, { label: "WhatsApp", name: "whatsapp", icon: Phone, ph: "Ej. 11 1234 5678", type: "tel" }, { label: "Dirección", name: "direccion", icon: MapPin, ph: "Calle, Número, Localidad", type: "text" }, { label: "Horario", name: "horario", icon: Clock, ph: "Ej. Lun a Vie 9-18hs", type: "text" } ].map((field, idx) => (
+                        <div key={idx}>
+                        <label htmlFor={field.name} className="block text-sm font-bold text-gray-700 mb-1.5 ml-1">{field.label}</label>
+                        <div className="relative group">
+                            <field.icon className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 group-focus-within:text-pink-500 transition-colors" />
+                            <input 
+                                required 
+                                id={field.name}
+                                type={field.type} 
+                                name={field.name} 
+                                value={formData[field.name]} 
+                                onChange={handleChange} 
+                                className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-pink-100 focus:border-pink-500 outline-none transition-all font-medium text-gray-900 placeholder-gray-400" 
+                                placeholder={field.ph} 
+                            />
+                        </div>
+                        </div>
+                    ))}
+                    <button type="submit" className="w-full mt-4 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-pink-500/30 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"><Send className="w-5 h-5" /> Enviar Solicitud de Alta</button>
+                    <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100"><CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" /><p className="text-xs text-gray-500 leading-relaxed">Al enviar este formulario aceptas ser contactado por nuestro equipo comercial.</p></div>
+                </form>
+                </main>
+            </div>
+            );
+        });
+
+        // ==========================================
+        // LANDING PAGE (OPTIMIZADA)
+        // ==========================================
+
+        const LandingPage = memo(({ onNavigateToRegister, onNavigateToTerms, onNavigateToPrivacy }) => {
+            const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+            const [scrolled, setScrolled] = useState(false);
+            const [openFaq, setOpenFaq] = useState(null);
+
+            useEffect(() => {
+            const handleScroll = () => setScrolled(window.scrollY > 20);
+            window.addEventListener('scroll', handleScroll, { passive: true });
+            return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            const toggleFaq = (index) => setOpenFaq(openFaq === index ? null : index);
+            
+            const scrollToSection = (e, id) => {
+                e.preventDefault();
+                const element = document.getElementById(id);
+                if (element) {
+                    const headerOffset = 80;
+                    const elementPosition = element.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                    window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+                }
+                setIsMobileMenuOpen(false);
+            };
+
+            return (
+            <div className="font-sans text-gray-800 bg-white relative selection:bg-pink-100 selection:text-pink-900 overflow-x-hidden scroll-smooth">
+                <GlobalStyles />
+                <a 
+                    href={DATA.whatsappLink} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    aria-label="Contactar por WhatsApp"
+                    className="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white p-3 md:p-4 rounded-full shadow-2xl hover:bg-[#20bd5a] transition-all transform hover:scale-110 active:scale-95 flex items-center justify-center gap-2 group border-4 border-white ring-2 ring-black/5 focus:outline-none focus:ring-4 focus:ring-green-400"
+                >
+                    <WhatsAppIcon className="w-6 h-6 md:w-7 md:h-7" />
+                    <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 ease-in-out whitespace-nowrap font-bold text-sm hidden md:inline-block">Más Info</span>
+                </a>
+
+                <nav className={`fixed w-full z-40 font-poppins transition-all duration-300 ${scrolled || isMobileMenuOpen ? 'bg-gray-900/95 backdrop-blur-md shadow-lg py-3' : 'bg-transparent py-4'}`}>
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex justify-between items-center h-12">
+                    <div className="flex items-center cursor-pointer z-50" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}><span className="text-2xl font-extrabold flex items-center gap-2 tracking-tight text-white hover:scale-105 transition-transform"><DonutIcon className="w-8 h-8 text-pink-500" /> Dona Pop</span></div>
+                    <div className="hidden md:flex items-center space-x-6">
+                        {['Beneficios', 'Productos', 'Rentabilidad', 'FAQ'].map((item) => (
+                            <a 
+                                key={item} 
+                                href={`#${item.toLowerCase()}`}
+                                onClick={(e) => scrollToSection(e, item.toLowerCase())} 
+                                className="text-sm font-semibold text-gray-200 hover:text-white transition-colors uppercase tracking-wide hover:scale-105 focus:outline-none focus:text-pink-400"
+                            >
+                                {item}
+                            </a>
+                        ))}
+                        <button onClick={onNavigateToRegister} className="bg-white text-pink-600 hover:bg-gray-100 px-6 py-2 rounded-full font-bold text-sm transition-all shadow-lg transform hover:-translate-y-0.5 hover:shadow-xl active:scale-95 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 focus:ring-offset-gray-900">Alta Cliente</button>
+                    </div>
+                    <div className="md:hidden flex items-center z-50">
+                        <button 
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
+                            aria-label={isMobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
+                            aria-expanded={isMobileMenuOpen}
+                            className="focus:outline-none text-white p-2 active:scale-90 transition-transform focus:ring-2 focus:ring-pink-500 rounded-lg"
+                        >
+                            {isMobileMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
+                        </button>
+                    </div>
+                    </div>
+                </div>
+                {isMobileMenuOpen && (
+                    <div className="md:hidden absolute top-full left-0 w-full bg-gray-900 border-t border-gray-800 shadow-xl animate-in slide-in-from-top-5">
+                        <div className="flex flex-col py-4 px-4 space-y-2">
+                            {['Beneficios', 'Productos', 'Rentabilidad', 'FAQ'].map((item) => (
+                                <a 
+                                    key={item} 
+                                    href={`#${item.toLowerCase()}`}
+                                    onClick={(e) => scrollToSection(e, item.toLowerCase())} 
+                                    className="text-left px-4 py-3 text-gray-100 font-medium hover:bg-gray-800 rounded-xl transition-colors text-base"
+                                >
+                                    {item}
+                                </a>
+                            ))} 
+                            <button onClick={onNavigateToRegister} className="text-center px-4 py-3 text-white font-bold bg-pink-600 hover:bg-pink-700 rounded-xl transition-colors text-base mt-2 shadow-lg">Solicitar Alta de Cliente</button>
+                        </div>
+                    </div>
+                )}
+                </nav>
+
+                {/* HERO - Compactado pero Impactante */}
+                <header className="hero-bg relative flex flex-col items-center justify-center w-full min-h-[90vh] md:min-h-screen overflow-hidden pt-20 pb-16">
+                <div className="w-full max-w-5xl mx-auto px-4 text-center flex flex-col items-center z-10 animate-in fade-in slide-in-from-bottom-10 duration-1000">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 backdrop-blur-md border border-white/10 mb-6 animate-pulse shadow-lg ring-1 ring-white/10"><span className="flex h-2 w-2 relative"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-pink-500"></span></span><span className="text-pink-100 font-bold text-xs tracking-widest uppercase">Líderes en venta impulsiva</span></div>
+                    <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight font-poppins tracking-tight drop-shadow-xl">Sistematiza la <br className="md:hidden" /><span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400">Venta de Impulso</span></h1>
+                    <p className="text-base sm:text-lg md:text-2xl text-gray-300 font-light mb-10 max-w-2xl mx-auto leading-relaxed px-2 drop-shadow-md">Transforma tu punto de venta en una máquina de rentabilidad automática. Logística inteligente, riesgo controlado y ganancias aseguradas.</p>
+                    <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-6 sm:px-0"><button onClick={onNavigateToRegister} className="w-full sm:w-auto bg-gradient-to-r from-pink-600 to-pink-500 text-white px-8 py-3.5 rounded-full text-lg font-bold hover:shadow-pink-500/30 hover:shadow-2xl transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2 active:scale-95 focus:outline-none focus:ring-4 focus:ring-pink-500/50">Solicitar Alta <ArrowRight className="w-5 h-5" /></button><button onClick={(e) => scrollToSection(e, 'rentabilidad')} className="w-full sm:w-auto bg-white/5 backdrop-blur-sm text-white border border-white/20 px-8 py-3.5 rounded-full text-lg font-bold hover:bg-white/10 transition-all flex items-center justify-center gap-2 active:scale-95 focus:outline-none focus:ring-4 focus:ring-white/50"><BarChart3 className="w-5 h-5" /> Ver Rentabilidad</button></div>
+                </div>
+                
+                {/* Scroll Indicator - CORREGIDO PARA MÓVIL */}
+                {/* Se usó 'inset-x-0' y 'justify-center' en lugar de translate para evitar conflicto con la animación */}
+                <div className="absolute bottom-6 inset-x-0 mx-auto flex flex-col items-center justify-center animate-bounce text-white/50 cursor-pointer z-20" onClick={(e) => scrollToSection(e, 'rentabilidad')}>
+                    <span className="text-[10px] font-bold tracking-widest uppercase mb-1">Desliza</span>
+                    <ChevronDown className="w-5 h-5" />
+                </div>
+                </header>
+
+                {/* PSICOLOGIA - Layout limpio - CORREGIDO: UL inválido cambiado a DIV */}
+                <section className="py-16 md:py-24 bg-gray-900 text-white font-poppins relative">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+                    <div className="space-y-8">
+                        <Reveal>
+                        <h2 className="text-3xl md:text-4xl font-bold mb-4 tracking-tight">La Psicología del Impulso</h2>
+                        <p className="text-gray-300 text-base leading-relaxed border-l-4 border-pink-500 pl-5">Dona Pop no es solo un producto delicioso; es una estrategia comercial diseñada milimétricamente. Cada detalle visual está pensado para activar el gatillo de compra inmediata.</p>
+                        </Reveal>
+                        <div className="space-y-6 mt-6">
+                        {DATA.psychologyItems.map((item, index) => (
+                            <Reveal key={index} delay={index * 150}>
+                            <div className="flex items-start group"><div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center mt-1 transition-transform group-hover:scale-110 ${item.bg}`}><item.icon className={`w-6 h-6 ${item.color}`} /></div><div className="ml-5"><h4 className={`text-lg font-bold mb-1 ${item.color}`}>{item.title}</h4><p className="text-gray-400 leading-relaxed text-sm">{item.desc}</p></div></div>
+                            </Reveal>
+                        ))}
+                        </div>
+                    </div>
+                    <Reveal delay={300} className="relative mt-8 lg:mt-0">
+                        <div className="relative bg-gray-800/50 border border-white/10 p-8 md:p-10 rounded-2xl backdrop-blur-xl shadow-2xl">
+                        <div className="text-center space-y-6">
+                            <div className="inline-flex p-4 bg-gray-900 rounded-full shadow-inner border border-gray-700"><Store className="text-pink-500 w-12 h-12" /></div>
+                            <div><h3 className="text-2xl md:text-3xl font-bold mb-3">Tu Mostrador = Tu Activo</h3><p className="text-gray-300 text-base">Cada centímetro cuadrado cuenta. <br/>Nosotros lo hacemos <span className="text-white font-bold underline decoration-pink-500 underline-offset-4">rentable</span>.</p></div>
+                            <div className="pt-6 border-t border-gray-700/50 grid grid-cols-2 gap-6"><div className="text-center"><p className="text-3xl font-bold text-white">100%</p><p className="text-xs text-gray-500 uppercase tracking-widest mt-1">Automático</p></div><div className="text-center border-l border-gray-700/50"><p className="text-3xl font-bold text-white">0%</p><p className="text-xs text-gray-500 uppercase tracking-widest mt-1">Esfuerzo</p></div></div>
+                        </div>
+                        </div>
+                    </Reveal>
+                    </div>
+                </div>
+                </section>
+
+                {/* DASHBOARD - Recuperado y Optimizado */}
+                <section id="rentabilidad" className="py-16 md:py-24 px-4 bg-white relative font-poppins">
+                <div className="max-w-7xl mx-auto">
+                    <Reveal><div className="text-center mb-12 max-w-4xl mx-auto"><div className="inline-flex items-center gap-2 bg-pink-50 px-4 py-1.5 rounded-full mb-6 text-xs font-bold tracking-widest uppercase text-pink-600 border border-pink-100"><BarChart3 className="w-4 h-4" /> Análisis Financiero</div><h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-6">Números que Hablan</h2><p className="text-gray-500 text-lg leading-relaxed">Transparencia total en los márgenes. Cada Caja Master representa una ganancia neta superior al <strong className="text-gray-900 font-bold">40%</strong>, convirtiendo tu mostrador en un activo de alta performance.</p></div></Reveal>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+                        <div className="space-y-10">
+                        <Reveal delay={200} className="bg-blue-50/50 border border-blue-100 rounded-3xl p-8 shadow-sm hover:shadow-md transition-shadow">
+                            <h4 className="text-xs md:text-sm font-bold text-blue-800 uppercase tracking-widest mb-6 flex items-center gap-2"><Coins className="w-5 h-5" /> Economía Unitaria (Pack x8)</h4>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100"><p className="text-xs text-gray-500 font-bold uppercase mb-2">Tu Costo Unitario</p><div className="flex items-baseline gap-1"><span className="text-3xl font-bold text-gray-900">$2.000</span><span className="text-sm text-gray-400">/ud</span></div></div>
+                            <div className="bg-white p-5 rounded-2xl shadow-sm border border-green-100 ring-1 ring-green-500/10"><p className="text-xs text-green-700 font-bold uppercase mb-2">Venta Sugerida</p><div className="flex items-baseline gap-1"><span className="text-3xl font-bold text-green-600">$2.900</span><span className="text-sm text-green-600/70">/ud</span></div><div className="mt-3 inline-block px-3 py-1 bg-green-50 rounded-lg text-[11px] font-semibold text-green-700">Rango: $2.900 - $3.500</div></div>
+                            </div>
+                        </Reveal>
+
+                        <Reveal delay={400} className="space-y-8 px-2">
+                            <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 pb-3">Proyección por Caja Master (8u)</h4>
+                            <div className="space-y-6">
+                            <div className="group space-y-2"><div className="flex justify-between items-end"><span className="text-sm font-semibold text-gray-600">Venta Total Estimada</span><span className="text-lg font-bold text-gray-900">$23.200</span></div><div className="h-3 bg-gray-100 rounded-full overflow-hidden"><div className="h-full bg-pink-400 w-full rounded-full transition-all duration-1000 ease-out group-hover:bg-pink-500"></div></div></div>
+                            <div className="group space-y-2"><div className="flex justify-between items-end"><span className="text-sm font-semibold text-gray-500">Costo por Caja</span><span className="text-lg font-bold text-gray-700">$16.000</span></div><div className="h-3 bg-gray-100 rounded-full overflow-hidden"><div className="h-full bg-gray-400 w-[69%] rounded-full relative transition-all duration-1000 ease-out group-hover:bg-gray-500"></div></div></div>
+                            <div className="pt-2"><div className="flex justify-between items-end mb-3"><span className="flex items-center gap-2 text-green-600 font-bold text-lg"><TrendingUp className="w-5 h-5" /> Tu Ganancia Neta</span><span className="text-3xl font-extrabold text-green-600 tracking-tight">$7.200</span></div><div className="h-8 bg-green-50 rounded-lg overflow-hidden border border-green-100 shadow-sm p-1"><div className="h-full bg-gradient-to-r from-green-500 to-emerald-500 w-[31%] rounded flex items-center justify-center relative overflow-hidden transition-all duration-1000 ease-out hover:w-full hover:opacity-90 cursor-help" title="Margen de ganancia"><span className="text-white text-[10px] font-bold tracking-wider relative z-10">NETO</span></div></div></div>
+                            </div>
+                        </Reveal>
+                        </div>
+
+                        <div className="flex flex-col gap-8">
+                        <Reveal delay={300} className="bg-gray-900 text-white rounded-3xl p-10 shadow-2xl flex flex-col items-center justify-center text-center relative overflow-hidden group hover:scale-[1.02] transition-transform duration-500"><div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 z-0"></div><div className="absolute -top-10 -right-10 w-40 h-40 bg-pink-500/20 rounded-full blur-3xl group-hover:bg-pink-500/30 transition-colors duration-500"></div><div className="relative z-10"><div className="p-4 bg-white/10 rounded-full w-fit mx-auto mb-6 backdrop-blur-md animate-float"><Calculator className="w-10 h-10 text-pink-400" /></div><p className="text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400 mb-2 tracking-tighter">45%</p><p className="text-xl font-bold text-white mb-1">Margen de Rentabilidad</p><p className="text-gray-400 text-sm">Calculado sobre venta base sugerida</p></div></Reveal>
+                        <div className="grid grid-cols-1 gap-4">{DATA.statsItems.map((stat, i) => (<Reveal key={i} delay={500 + (i * 100)} className="flex items-center gap-5 p-6 rounded-2xl bg-gray-50 border border-gray-100 hover:border-gray-200 transition-colors hover:translate-x-2 duration-300"><div className={`p-3 ${stat.bg} ${stat.color} rounded-xl`}><stat.icon className="w-6 h-6" /></div><div><h4 className="text-lg font-bold text-gray-900">{stat.title}</h4><p className="text-gray-500 text-sm">{stat.desc}</p></div></Reveal>))}</div>
+                        </div>
+                    </div>
+                </div>
+                </section>
+
+                {/* BENEFICIOS - Grid ajustado */}
+                <section id="beneficios" className="py-16 md:py-24 bg-slate-50 font-poppins">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <Reveal><div className="text-center mb-12 max-w-3xl mx-auto"><h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">El Sistema que Automatiza tus Ventas</h2><p className="text-lg text-gray-500 leading-relaxed">Infraestructura logística completa diseñada para que ganes dinero sin complicaciones operativas.</p></div></Reveal>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                    {DATA.benefitsItems.map((item, i) => (
+                        <Reveal key={i} delay={i * 100} className="bg-white p-6 rounded-3xl border border-gray-200/60 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                        <div className={`w-12 h-12 ${item.bg} rounded-xl flex items-center justify-center mb-4 group-hover:rotate-6 transition-transform`}><item.icon className={`${item.color} w-6 h-6`} /></div><h3 className="text-lg font-bold mb-2 text-gray-900">{item.title}</h3><p className="text-gray-500 leading-relaxed text-sm">{item.desc}</p>
+                        </Reveal>
+                    ))}
+                    </div>
+                </div>
+                </section>
+
+                {/* GARANTIA - Layout compacto dos columnas, sin espacio blanco arriba */}
+                <section className="w-full bg-white font-poppins border-t border-gray-100 pt-6 pb-16 md:pt-10 md:pb-24">
+                    <div className="max-w-7xl mx-auto px-6">
+                        <Reveal>
+                            <div className="max-w-5xl mx-auto">
+                                <div className="text-center md:text-left mb-10 flex flex-col md:flex-row items-center md:items-end justify-between gap-4">
+                                    <div><div className="inline-flex items-center gap-2 bg-emerald-100/50 px-4 py-1.5 rounded-full mb-3 text-xs font-bold tracking-widest uppercase text-emerald-700"><ShieldCheck className="w-4 h-4" /> Garantía Total</div><h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight">Riesgo Minimizado, <span className="text-emerald-600">Inversión Protegida.</span></h2></div>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="bg-gray-50/50 p-6 rounded-2xl border-l-4 border-emerald-500 hover:bg-gray-50 transition-colors"><h3 className="text-lg font-bold text-gray-900 mb-2">Política de Scrap Transparente</h3><p className="text-gray-600 mb-3 text-sm leading-relaxed">Aceptamos devoluciones de hasta el <span className="font-bold text-emerald-600">25% del producto vencido</span> bajo condición "Mano a Mano".</p><ul className="space-y-1">{["Devolución simplificada", "Sin penalizaciones", "Gestión inmediata"].map((item, i) => (<li key={i} className="flex items-center gap-2 text-xs text-gray-500 font-medium"><CheckCircle2 className="w-3 h-3 text-emerald-500" /> {item}</li>))}</ul></div>
+                                    <div className="bg-gray-50/50 p-6 rounded-2xl border-l-4 border-blue-500 hover:bg-gray-50 transition-colors"><h3 className="text-lg font-bold text-gray-900 mb-2">Control de Calidad</h3><p className="text-gray-600 mb-3 text-sm leading-relaxed">Estándares estrictos de frescura. Nuestro sistema logístico elimina el riesgo de recibir producto en mal estado.</p><ul className="space-y-1">{["Inspección pre-envío", "Temperatura controlada", "Embalaje profesional"].map((item, i) => (<li key={i} className="flex items-center gap-2 text-xs text-gray-500 font-medium"><CheckCircle2 className="w-3 h-3 text-blue-500" /> {item}</li>))}</ul></div>
+                                </div>
+                            </div>
+                        </Reveal>
+                    </div>
+                </section>
+
+                {/* EMPAQUE - Visual - CARD REEMPLAZO IMAGEN - OPTIMIZADO */}
+                <section className="w-full flex flex-col lg:flex-row-reverse bg-gray-900 text-white overflow-hidden font-poppins">
+                <div className="lg:w-1/2 p-8 md:p-16 flex flex-col justify-center bg-gray-900"><Reveal><div className="max-w-lg mx-auto lg:mx-0 lg:ml-auto"><div className="inline-flex items-center gap-2 bg-pink-500/20 border border-pink-500/30 px-3 py-1 rounded-full mb-6 text-[10px] font-bold tracking-widest uppercase text-pink-300"><Layers className="w-3 h-3" /> Optimización</div><h2 className="text-3xl md:text-4xl font-extrabold mb-4 leading-tight">Empaque Inteligente y Apilable</h2><p className="text-gray-400 text-base mb-8 leading-relaxed">El diseño de nuestras cajas master no solo protege el producto, sino que también optimiza cada centímetro de tu espacio de venta y almacenamiento.</p><div className="grid grid-cols-1 sm:grid-cols-2 gap-4"><div className="bg-gray-800/50 p-5 rounded-2xl border border-gray-700"><Maximize className="w-6 h-6 text-pink-500 mb-3" /><h4 className="font-bold text-white text-base mb-1">Orden Total</h4><p className="text-xs text-gray-400">Reducción del desorden visual en depósito.</p></div><div className="bg-gray-800/50 p-5 rounded-2xl border border-gray-700"><Package className="w-6 h-6 text-purple-500 mb-3" /><h4 className="font-bold text-white text-base mb-1">100% Estibables</h4><p className="text-xs text-gray-400">Facilita el manejo y la organización.</p></div></div></div></Reveal></div>
+                <div className="lg:w-1/2 p-8 lg:p-16 flex items-center justify-center bg-gray-800/50">
+                    <Reveal className="w-full max-w-lg">
+                        <div className="bg-gray-800 border border-gray-700 rounded-3xl p-3 shadow-2xl hover:scale-[1.02] transition-transform duration-500">
+                            <div className="bg-gray-900 rounded-2xl overflow-hidden relative">
+                                <img 
+                                    src="img/cajas.jpg" 
+                                    alt="Cajas Master Apiladas" 
+                                    width="564" height="426" 
+                                    loading="lazy"
+                                    className="w-full h-auto object-contain block transform hover:scale-105 transition-transform duration-700" 
+                                />
+                            </div>
+                            <div className="pt-3 px-2 flex justify-between items-center">
+                                <span className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Presentación Oficial</span>
+                                <div className="flex gap-1"><div className="w-1.5 h-1.5 rounded-full bg-pink-500"></div><div className="w-1.5 h-1.5 rounded-full bg-purple-500"></div></div>
+                            </div>
+                        </div>
+                    </Reveal>
+                </div>
+                </section>
+
+                {/* PRODUCTOS - OPTIMIZADO */}
+                <section id="productos" className="py-16 md:py-24 bg-white font-poppins">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <Reveal><div className="text-center mb-12"><h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Líneas de Producto</h2><p className="text-lg text-gray-500">Diseñados visualmente para activar el gatillo de compra por impulso.</p></div></Reveal>
+                    <div className="mb-16"><Reveal><div className="flex items-center gap-3 mb-8 pl-4 border-l-8 border-pink-500"><h3 className="text-2xl font-bold text-gray-900">Línea Dulce</h3><span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-xs font-bold uppercase tracking-wider">Clásico</span></div></Reveal>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {[{ name: "Chocolate con Oreo", desc: "¡Fusión perfecta de chocolate y crujientes trozos de galleta Oreo! Una tentación irresistible.", tag: "Top Seller", color: "pink", icon: TrendingUp, image: "img/oreo.jpg" }, { name: "Vainilla con Chips", desc: "Vainilla con corazón de chips, baño rosa sabor frutilla y grageas. ¡Un placer visual!", tag: "Visual Impact", color: "purple", icon: Eye, image: "img/chips.jpg" }].map((prod, i) => (
+                            <Reveal key={i} delay={(i + 1) * 150} className="group cursor-default hover:translate-y-[-5px] transition-transform duration-300">
+                                <div className="bg-gray-100 rounded-[2rem] overflow-hidden aspect-[16/9] relative mb-4 shadow-sm group-hover:shadow-lg transition-shadow">
+                                    <img 
+                                        src={prod.image} 
+                                        alt={prod.name} 
+                                        width="600" height="337" 
+                                        loading="lazy"
+                                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" 
+                                    />
+                                </div>
+                                <h4 className={`text-xl font-bold text-gray-900 mb-1`}>{prod.name}</h4><p className="text-gray-500 leading-relaxed text-sm mb-3">{prod.desc}</p><span className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase text-${prod.color}-600 bg-${prod.color}-50 px-2 py-1 rounded-md`}><prod.icon className="w-3 h-3"/> {prod.tag}</span>
+                            </Reveal>
+                        ))}
+                    </div>
+                    </div>
+                    <Reveal>
+                    <div className="bg-gray-900 rounded-[2.5rem] overflow-hidden shadow-xl flex flex-col md:flex-row min-h-[400px] group">
+                        <div className="md:w-1/2 relative bg-gray-800 min-h-[250px] overflow-hidden">
+                            <img 
+                                src="img/saladas.jpg" 
+                                alt="Línea Salada" 
+                                width="600" height="400" 
+                                loading="lazy"
+                                className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-700 transform group-hover:scale-105" 
+                            />
+                            <div className="absolute top-6 left-6 z-20"><span className="bg-orange-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-widest inline-flex items-center gap-2 shadow-lg"><Flame className="w-3 h-3" /> Innovación</span></div>
+                        </div>
+                        <div className="md:w-1/2 p-8 md:p-12 flex flex-col justify-center text-white relative"><div className="relative z-10"><h3 className="text-2xl md:text-3xl font-bold mb-4">El Snacking Salado</h3><p className="text-gray-400 text-base mb-8 leading-relaxed">Rompemos el molde tradicional ofreciendo una alternativa salada de alta calidad para el antojo de mediodía.</p><div className="space-y-4">{[{ title: "Paleta y Queso Gratinado", sub: "El sabor familiar con un toque de pimienta.", icon: Utensils, color: "orange" }, { title: "Salame con Toque Picante", sub: "Intensidad premium con ají molido.", icon: Flame, color: "red" }].map((item, i) => (<div key={i} className="flex items-start gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors border border-transparent hover:border-white/10"><div className={`p-2 bg-${item.color}-500/20 text-${item.color}-400 rounded-lg`}><item.icon className="w-5 h-5" /></div><div><h5 className="font-bold text-base mb-0.5">{item.title}</h5><p className="text-gray-400 text-xs">{item.sub}</p></div></div>))}</div></div></div>
+                    </div>
+                    </Reveal>
+                </div>
+                </section>
+
+                {/* FAQ */}
+                <section id="faq" className="py-16 bg-gray-50 border-t border-gray-100 font-poppins">
+                <div className="max-w-3xl mx-auto px-6">
+                    <Reveal><div className="text-center mb-10"><h2 className="text-2xl md:text-4xl font-bold text-gray-900 mb-3 tracking-tight">Preguntas Frecuentes</h2><p className="text-base text-gray-500">Todo lo que necesitas saber antes de empezar.</p></div></Reveal>
+                    <div className="space-y-3">
+                    {DATA.faqItems.map((item, i) => (
+                        <Reveal key={i} delay={i * 50}>
+                        <div 
+                            className={`bg-white rounded-xl border transition-all duration-300 cursor-pointer ${openFaq === i ? 'border-pink-500 ring-1 ring-pink-500 shadow-md' : 'border-gray-200 hover:border-pink-300'}`} 
+                            onClick={() => toggleFaq(i)}
+                            aria-expanded={openFaq === i}
+                            aria-controls={`faq-answer-${i}`}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleFaq(i); } }}
+                        >
+                            <div className="flex justify-between items-center p-5"><h3 className={`text-base font-bold transition-colors ${openFaq === i ? 'text-pink-600' : 'text-gray-900'}`}>{item.question}</h3><div className={`p-1 rounded-full ${openFaq === i ? 'text-pink-600' : 'text-gray-400'}`}>{openFaq === i ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}</div></div>
+                            <div 
+                                id={`faq-answer-${i}`}
+                                className={`overflow-hidden transition-all duration-300 ${openFaq === i ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}
+                            >
+                                <p className="px-5 pb-5 text-gray-500 text-sm leading-relaxed border-t border-gray-50 pt-3">{item.answer}</p>
+                            </div>
+                        </div>
+                        </Reveal>
+                    ))}
+                    </div>
+                </div>
+                </section>
+
+                {/* FOOTER */}
+                <footer className="bg-gray-900 text-white py-12 border-t border-gray-800 font-poppins text-sm">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div className="text-center md:text-left"><span className="text-2xl font-extrabold text-white flex items-center justify-center md:justify-start gap-2 hover:text-pink-500 transition-colors cursor-pointer"><DonutIcon className="text-pink-500 w-6 h-6" /> Dona Pop</span><p className="text-gray-400 mt-2">Sistematizando la venta por impulso en Argentina. <br/> Logística eficiente, rentabilidad asegurada.</p></div>
+                    <div className="flex flex-col items-center md:items-end gap-3"><p className="text-gray-400">¿Dudas? Escríbenos directamente</p><a href={DATA.whatsappLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white bg-green-600 hover:bg-green-700 px-5 py-2.5 rounded-full font-bold transition-colors hover:shadow-lg hover:shadow-green-500/20 focus:outline-none focus:ring-2 focus:ring-green-400"><WhatsAppIcon className="w-4 h-4" /> Iniciar Chat WhatsApp</a></div>
+                    </div>
+                    <div className="mt-8 border-t border-gray-800 pt-6 flex flex-col md:flex-row justify-between items-center text-gray-500"><p>&copy; 2024 Dona Pop. Todos los derechos reservados.</p><div className="flex gap-6 mt-4 md:mt-0"><button onClick={onNavigateToTerms} className="hover:text-white cursor-pointer transition focus:outline-none focus:text-pink-400">Términos y Condiciones</button><button onClick={onNavigateToPrivacy} className="hover:text-white cursor-pointer transition focus:outline-none focus:text-pink-400">Política de Privacidad</button></div></div>
+                </div>
+                </footer>
+            </div>
+            );
+        });
+
+        const App = () => {
+            const [currentView, setCurrentView] = useState('landing');
+
+            // SOLUCIÓN: Manejo del Historial del Navegador (History API)
+            // Esto permite que el botón "Atrás" del celular y el gesto de deslizar funcionen
+            useEffect(() => {
+                // 1. Aseguramos que el estado inicial tenga una marca en el historial
+                window.history.replaceState({ view: 'landing' }, '');
+
+                // 2. Escuchamos el evento 'popstate' (cuando el usuario toca Atrás o desliza)
+                const handlePopState = (event) => {
+                    if (event.state && event.state.view) {
+                        // Si hay un estado guardado, volvemos a esa vista
+                        setCurrentView(event.state.view);
+                    } else {
+                        // Si por alguna razón no hay estado, volvemos seguro al landing
+                        setCurrentView('landing');
+                    }
+                };
+
+                window.addEventListener('popstate', handlePopState);
+                return () => window.removeEventListener('popstate', handlePopState);
+            }, []);
+
+            // Función para navegar hacia adelante (crea una entrada en el historial)
+            const navigateTo = (viewName) => {
+                window.history.pushState({ view: viewName }, ''); // Agrega al historial
+                setCurrentView(viewName);
+                window.scrollTo(0, 0); // Sube al inicio de la página
+            };
+
+            // Función para volver atrás (usa el historial del navegador)
+            const goBack = () => {
+                window.history.back(); // Esto dispara el evento 'popstate' automáticamente
+            };
+
+            const views = { 
+                landing: <LandingPage 
+                            onNavigateToRegister={() => navigateTo('register')} 
+                            onNavigateToTerms={() => navigateTo('terms')} 
+                            onNavigateToPrivacy={() => navigateTo('privacy')} 
+                         />, 
+                register: <CommerceForm onBack={goBack} />, 
+                terms: <TermsPage onBack={goBack} />, 
+                privacy: <PrivacyPage onBack={goBack} /> 
+            };
+            
+            return views[currentView] || null;
+        }
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
 </html>
